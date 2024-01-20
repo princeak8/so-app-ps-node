@@ -1,0 +1,1 @@
+// const Resource = require('resources.js');
