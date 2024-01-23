@@ -16,7 +16,7 @@ interface rangeInterface {
 
 const LoadDropService = {
     save: async function(data: loadDropRequest) {
-        const loadDrop = new LoadDrop();
+        let loadDrop = new LoadDrop();
         loadDrop.powerStation = data.powerStationId;
         loadDrop.load = data.load;
         loadDrop.previous_load = data.previousLoad;
@@ -24,7 +24,8 @@ const LoadDropService = {
         // loadDrop.percentage_drop = data.percentage;
         loadDrop.time_of_drop = data.timeOfDrop
         loadDrop.calculation_type = data.calType;
-        return await manager.save(loadDrop);
+        loadDrop = await manager.save(loadDrop);
+        return this.getLoadDrop(loadDrop.id);
     },
 
     acknowledge: async function(data: acknowledgeLoadDropRequest) {

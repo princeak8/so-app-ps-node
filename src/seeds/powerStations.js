@@ -30,6 +30,7 @@ const seedPowerStations = async () => {
     { name: 'Geregu NIPP (Gas)', identifier: stationId.GereguNipp },
     { name: 'Gbarain (Gas)', identifier: stationId.Gbarain },
     { name: 'Ihovbor (Gas)', identifier: stationId.Ihovbor },
+    { name: 'Ibom Power', identifier: stationId.Ibom },
     { name: 'Jebba (Hydro)', identifier: stationId.Jebba },
     { name: 'Kainji (Hydro)', identifier: stationId.Kainji },
     { name: 'Odukpani (Gas)', identifier: stationId.Odukpani },

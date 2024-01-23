@@ -8,6 +8,7 @@ import { validate } from "class-validator";
 import { validatorErrors } from "../helpers";
 import logger from "../logger";
 const LoadDropResource = require("../resources/loadDropResource");
+const jc = require('json-cycle');
 
 type Params = {};
 type ResBody = {};
@@ -17,6 +18,33 @@ type ReqQuery = {
 }
 
 class PowerDropController {
+    static stringify = (obj: any) => {
+        let cach: any = [];
+        Object.keys(obj).forEach((key) => {
+            if(typeof obj[key] === "object" && obj[key] !== null) {
+                if(cach.indexOf(obj[key]) !== -1) {
+                    delete obj[key];
+                }
+            }
+        })
+        return obj;
+
+        let cache:any = [];
+        let str = JSON.stringify(obj, function(key, value) {
+          if (typeof value === "object" && value !== null) {
+            if (cache.indexOf(value) !== -1) {
+              // Circular reference found, discard key
+              return;
+            }
+            // Store value in our collection
+            cache.push(value);
+          }
+          return value;
+        });
+        cache = null; // reset the cache
+        return str;
+    }
+
     static save = async (req: Request, res:Response) => {
         try{
             const { powerStationId, load, previousLoad, referenceLoad, timeOfDrop, calType } = req.body;
@@ -49,10 +77,11 @@ class PowerDropController {
 
             data.powerStationId = powerStation.id;
             loadDrop = await LoadDropService.save(data);
-            res.status(200).send(new LoadDropResource(loadDrop));
+            res.status(200).send(loadDrop);
+            // res.status(200).send(this.stringify(loadDrop));
         } catch (error) {
             logger.error('Error creating power drop', error);
-            res.status(500).send('Error creating power drop');
+            res.status(500).send('Error creating power drop: '+error);
         }
     }
 
