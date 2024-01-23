@@ -6,7 +6,7 @@ import { percentage } from "../helpers";
 class LoadDropResource extends Resource {
     
     toArray() {
-        const pwrStation = new powerStation(this.powerStation);
+        // const pwrStation = new powerStation(this.powerStation);
         const load = (this.load == undefined) ? 0.0 : Number(this.load);
         const prevLoad = (this.previous_load == undefined) ? 0 : Number(this.previous_load);
         const refLoad = (this.reference_load == undefined) ? 0 : Number(this.reference_load);
