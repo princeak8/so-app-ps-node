@@ -8,7 +8,7 @@ import { validate } from "class-validator";
 import { validatorErrors } from "../helpers";
 import logger from "../logger";
 const LoadDropResource = require("../resources/loadDropResource");
-const jc = require('json-cycle');
+// const jc = require('json-cycle');
 
 type Params = {};
 type ResBody = {};
