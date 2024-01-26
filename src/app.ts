@@ -43,6 +43,9 @@ const server = http.createServer(app);
 server.on("upgrade", async function upgrade(request:IncomingMessage, socket:Duplex, head:Buffer) {
     wss.handleUpgrade(request, socket, head, function done(ws) {
         wss.emit("connection", ws, request);
+        socket.on("error", (err) => {
+            console.log("An error occured: ", err);
+        })
     });
 });
 
