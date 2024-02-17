@@ -19,6 +19,7 @@ const ormconfig = {
       migrationsDir: 'src/migrations',
       subscribersDir: 'src/subscribers',
     },
+    ssl: false
   };
   
   export default ormconfig;

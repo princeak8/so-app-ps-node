@@ -41,8 +41,10 @@ app.use('/api', routes);
 const server = http.createServer(app);
 
 server.on("upgrade", async function upgrade(request:IncomingMessage, socket:Duplex, head:Buffer) {
+    // console.log('upgraded');
     wss.handleUpgrade(request, socket, head, function done(ws) {
-        wss.emit("connection", ws, request);
+        // console.log('handling upgrade')
+        // wss.emit("connection", ws, request);
         socket.on("error", (err) => {
             console.log("An error occured: ", err);
         })
@@ -80,8 +82,8 @@ const options2 = {
 
 const host = process.env.MQTT_HOST; //"mqtt://102.89.11.82";
 const host2 = process.env.MQTT_AWS_HOST; //"mqtt://ec2-3-88-196-213.compute-1.amazonaws.com";
-var client = mqtt.connect(host, options);
-var client2 = mqtt.connect(host2, options2);
+let client = mqtt.connect(host, options);
+let client2 = mqtt.connect(host2, options2);
 
 mqttConnect(client, topics);
 mqttConnect(client2, topics);
@@ -90,7 +92,17 @@ StationController.sendNccMessage(wss, client);
 StationController.sendAwsMessage(wss, client2);
 
 server.listen("3002", async () => {
-    await database();
+    await startDB();
     // seedPowerStations();
     console.log("Server started on port 3002");
-  });
+});
+
+async function startDB()
+{
+    try{
+        await database();
+    }catch(err:any) {
+        console.log('Attempting to start DB again');
+        startDB();
+    }
+}
