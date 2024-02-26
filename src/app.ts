@@ -12,6 +12,7 @@ import { Duplex } from "stream";
 
 import topics from "./topics";
 import mqttConnect from "./mqttConnect";
+import logger from "./logger";
 
 const wss = new WebSocket.Server({ noServer: true });
 
@@ -22,14 +23,17 @@ app.use(express.json());
 
 const server = http.createServer(app);
 
+server.on('connection', (socket: any) => {
+    socket.on('error', (err:any) => logger.error(err));
+});
+
 server.on("upgrade", async function upgrade(request:IncomingMessage, socket:Duplex, head:Buffer) {
-    // console.log('upgraded');
+    // console.log(request.headers.upgrade);
     wss.handleUpgrade(request, socket, head, function done(ws) {
-        // console.log('handling upgrade')
-        // wss.emit("connection", ws, request);
-        socket.on("error", (err) => {
-            console.log("An error occured: ", err);
-        })
+        
+    //     // console.log('handling upgrade')
+    //     // wss.emit("connection", ws, request);
+        ws.on("error", (error) => console.log("websocket error", error));
     });
 });
 
