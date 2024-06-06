@@ -39,3 +39,13 @@ export const wait = (ms: number) => {
         setTimeout(resolve, ms);
     })
 }
+
+export const getDate = (adjustOffset:boolean = true) => {
+    let date = new Date();
+    let timezoneOffset = date.getTimezoneOffset();
+    let adjustedOffset = timezoneOffset * -1;
+    // let lagosOffset = 120; // this is the offset for the Pacific Standard Time timezone
+    // let adjustedTime = new Date(date.getTime() + (lagosOffset + timezoneOffset) * 60 * 1000);
+    let adjustedDate = new Date(date.getTime() + adjustedOffset * 60 * 1000);
+    return adjustedDate;
+}

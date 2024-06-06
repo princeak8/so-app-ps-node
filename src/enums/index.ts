@@ -45,6 +45,7 @@ export enum stationId {
 export enum storage {
     StationTotal = 'stationTotal',
     StartSendingTotal = 'startSendingTotal',
+    StartedSendingTotal = 'startedSendingTotal',
     Olorunsogo1 = 'olorunsogo1',
     Olorunsogo2 = 'olorunsogo2',
     OlorunsogoLines = 'olorunsogoLines',

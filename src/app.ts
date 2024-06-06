@@ -108,12 +108,6 @@ localStorage.removeItems([storage.StationTotal, storage.Olorunsogo1, storage.Olo
     storage.OlorunsogoGas, storage.OlorunsogoLines, storage.OlorunsogoNipp, storage.ReceivingDataStartTime
 ]);
 localStorage.setItem(storage.StartSendingTotal, false);
-
-
-let date = new Date();
-let timezoneOffset = date.getTimezoneOffset();
-let pstOffset = -1; // this is the offset for the Pacific Standard Time timezone
-let adjustedTime = new Date(date.getTime() + (pstOffset + timezoneOffset) * 60 * 1000);
-// console.log(timezoneOffset);
+localStorage.setItem(storage.StartedSendingTotal, false);
 
 server.listen("3002", async () => console.log("Server started on port 3002"));

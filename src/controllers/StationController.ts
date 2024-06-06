@@ -3,9 +3,11 @@ import { Client } from "mqtt";
 import axios from "axios";
 import { ihovborConversion, gereguConversion, olorunsogoConversion, sapeleConversion, odukpaniConversion } from '../conversions';
 import { prepareNC, formatStreamedData, aggregateTotal } from '../utilities';
-import { type rawStationType } from '../types';
+import { type rawStationType, type totalType } from '../types';
 import localStorage from '../localStorage';
 import { storage } from '../enums';
+import { getDate } from '../helpers';
+import logger from '../logger';
 
 const StationController:{ [index: string]: Function } = {};
 
@@ -42,8 +44,7 @@ const send = (msg:string, topic:string, wsClient:WebSocket.WebSocket) => {
                 let ihovborArr = ihovborConversion(msg);
                 if(ihovborArr.length > 0) {
                     ihovborArr.forEach((vals) => {
-                        formatData(JSON.parse(vals));
-                        wsClient.send(vals)
+                        sendData(wsClient, vals);
                     }); 
                     break;
                 }
@@ -51,8 +52,7 @@ const send = (msg:string, topic:string, wsClient:WebSocket.WebSocket) => {
                 let gereguArr = gereguConversion(msg);
                 if(gereguArr.length > 0) {
                     gereguArr.forEach((vals) => {
-                        formatData(JSON.parse(vals));
-                        wsClient.send(vals)
+                        sendData(wsClient, vals);
                     }); 
                     break; 
                 }
@@ -60,8 +60,7 @@ const send = (msg:string, topic:string, wsClient:WebSocket.WebSocket) => {
                 let olorunsogoArr = olorunsogoConversion(msg);
                 if(olorunsogoArr.length > 0) {
                     olorunsogoArr.forEach((vals) => {
-                        formatData(JSON.parse(vals));
-                        wsClient.send(vals)
+                        sendData(wsClient, vals);
                     }); 
                     break;
                 }
@@ -69,8 +68,7 @@ const send = (msg:string, topic:string, wsClient:WebSocket.WebSocket) => {
                 let sapeleArr = sapeleConversion(msg);
                 if(sapeleArr.length > 0) {
                     sapeleArr.forEach((vals) => {
-                        formatData(JSON.parse(vals));
-                        wsClient.send(vals)
+                        sendData(wsClient, vals);
                     }); 
                     break;
                 }
@@ -78,18 +76,25 @@ const send = (msg:string, topic:string, wsClient:WebSocket.WebSocket) => {
                 let odukpaniArr = odukpaniConversion(msg);
                 if(odukpaniArr.length > 0) {
                     odukpaniArr.forEach((vals) => {
-                        formatData(JSON.parse(vals));
-                        wsClient.send(vals)
+                        sendData(wsClient, vals);
                     }); 
                     break;
                 }
             default:
-                formatData(JSON.parse(msg));
-                wsClient.send(msg);
+                sendData(wsClient, msg);
         }
     }else{
         let msgs = prepareNC(topic, msg);
         if(msgs.length > 0) msgs.forEach((msg) => wsClient.send(msg));
+    }
+}
+
+const sendData = (wsClient:WebSocket.WebSocket, data:string) => {
+    try{
+        formatData(JSON.parse(data));
+        wsClient.send(data);
+    }catch(err){
+        logger.error(err);
     }
 }
 
@@ -98,7 +103,24 @@ const formatData = (data: rawStationType) => {
     let isAbsolute = (formattedData?.id != 'olorunsogoLines') ? true : false;
     let total = aggregateTotal(formattedData, isAbsolute);
     // if(startSendingTotalToPowerBi() && sendNewDataToPowerBi()) sendTotalToPowerBi(total);
+    let started = localStorage.getItem(storage.StartedSendingTotal);
+    if(startSendingTotalToPowerBi() && !started) startSendingLoop();
     // console.log('total:',total);
+}
+
+const startSendingLoop = () => {
+    
+        console.log('start sending');
+            let intervalId = setInterval(() => {
+                let storageTotal: totalType | undefined = localStorage.getItem(storage.StationTotal);
+                if(storageTotal != undefined) {
+                    let total = Object.values(storageTotal).reduce((sumTotal, curr) => sumTotal + parseFloat(curr.toString()), 0);
+                    sendTotalToPowerBi(total);
+                }
+            }, 2000);
+            localStorage.setItem(storage.StartedSendingTotal, true);
+        
+        // clearInterval(intervalId);
 }
 
 const sendTotalToPowerBi = (total: number) => {
@@ -107,13 +129,13 @@ const sendTotalToPowerBi = (total: number) => {
     let data = [
             {
                 "total_gen" :total,
-                "time" : new Date().toISOString()
+                "time" : getDate().toISOString()
             }
         ]
     if(url != undefined) {
         axios.post(url, data)
         .then(() => {
-            console.log('sent ', data);
+            // console.log('sent ', data);
         })
         .catch((err) => {
             console.log('an error occured while sending total to powerBI '+err);
@@ -126,14 +148,14 @@ const startSendingTotalToPowerBi = () => {
     if(receivingDataStartTime != undefined) {
         let startSendingTotal = localStorage.getItem(storage.StartSendingTotal);
         if(startSendingTotal == undefined || !startSendingTotal) {
-            let now = new Date().getTime();
+            let now = getDate().getTime();
             let timeElapsed = now - receivingDataStartTime;
             startSendingTotal = ((timeElapsed/1000) > 60) ? true : false;
             localStorage.setItem(storage.StartSendingTotal, startSendingTotal);
         }
         return startSendingTotal;
     }else{
-        localStorage.setItem(storage.ReceivingDataStartTime, new Date().getTime());
+        localStorage.setItem(storage.ReceivingDataStartTime, getDate().getTime());
         return false;
     }
 }
@@ -142,14 +164,14 @@ const sendNewDataToPowerBi = () => {
     let lastSentTime: number | undefined = localStorage.getItem(storage.LastSentTime);
     let send = false;
     if(lastSentTime != undefined) {
-        let now = new Date().getTime();
+        let now = getDate().getTime();
         let timeElapsed = now - lastSentTime;
         if((timeElapsed/1000) >= 2) {
             send = true;
-            localStorage.setItem(storage.LastSentTime, new Date().getTime());
+            localStorage.setItem(storage.LastSentTime, getDate().getTime());
         }
     }else{
-        localStorage.setItem(storage.LastSentTime, new Date().getTime());
+        localStorage.setItem(storage.LastSentTime, getDate().getTime());
     }
     return send;
 }
