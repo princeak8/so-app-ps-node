@@ -37,7 +37,10 @@ class LocalStorage {
 
     async removeItems(keys) {
         if(Array.isArray(keys) && keys.length > 0) {
-            keys.forEach((key) => this.removeItem(key) );
+            keys.forEach((key) => {
+                if(this.getItem(key) != undefined) this.removeItem(key) 
+            });
+            
         }
     }
 
