@@ -22,7 +22,11 @@ class LocalStorage {
     }
 
     getItem(key) {
-        return this.items[key];
+        try {
+            return this.items[key];
+        }catch(err) {
+            //
+        }
     }
 
     async setItem(key, value) {
