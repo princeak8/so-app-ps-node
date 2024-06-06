@@ -41,3 +41,15 @@ export enum stationId {
     OlorunsogoNipp = 'olorunsogoNipp',
     Ibom = "ibom"
 }
+
+export enum storage {
+    StationTotal = 'stationTotal',
+    StartSendingTotal = 'startSendingTotal',
+    Olorunsogo1 = 'olorunsogo1',
+    Olorunsogo2 = 'olorunsogo2',
+    OlorunsogoLines = 'olorunsogoLines',
+    OlorunsogoGas = 'olorunsogoGas',
+    OlorunsogoNipp = 'olorunsogoNipp',
+    ReceivingDataStartTime = 'receivingDataStartTime',
+    LastSentTime = 'lastSentTime'
+}

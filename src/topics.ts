@@ -9,7 +9,7 @@ const ncc = [
     'dadinkowags/tv',
     'gbaraints/pv', 'gbaraints/status',
     // 'OkpaiippGs/tv', 'OkpaiippGs/status',
-    'parasenergyPs/pv',
+    // 'parasenergyPs/pv',
     'eketts/tv', 'eketts/status',
     'ekimts/tv', 'ekimts/status',
     'transamadi/tv'
@@ -29,7 +29,7 @@ const aws = [
     'odukpanits/pv', 'odukpanits/status',
     'OkpaiippGs/tv', 'OkpaiippGs/status',
     'omokugs/pv',
-    'phmains/tv', 'phmains/status',
+    'phmains/tv', 'phmains/status', 'parasenergyPs/pv',
     'riversIppPs/pr', 'riversIppPs/status',
     'sapelets/pv', 'sapelets/status',
     'shirorogs/pv', 'transamadi/tv',
