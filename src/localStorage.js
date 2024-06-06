@@ -1,3 +1,5 @@
+// import logger from './logger';
+
 var { writeFileSync, existsSync, readFileSync, unlink } = require('fs');
 
 class LocalStorage {
@@ -5,7 +7,11 @@ class LocalStorage {
     constructor() {
         if (existsSync('localStorage.json')) {
             var txt = readFileSync('localStorage.json');
-            this.items = JSON.parse(txt);
+            try{
+                this.items = JSON.parse(txt);
+            }catch(err){
+                // logger.error(err);
+            }
         } else {
             this.items = {};
         }
