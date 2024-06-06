@@ -7,6 +7,7 @@ class LocalStorage {
     constructor() {
         if (existsSync('localStorage.json')) {
             var txt = readFileSync('localStorage.json');
+            console.log('txt', txt);
             try{
                 this.items = JSON.parse(txt);
             }catch(err){
