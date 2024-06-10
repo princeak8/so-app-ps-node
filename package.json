@@ -7,7 +7,7 @@
   "target": "es2017",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx nodemon",
+    "start": "npx nodemon --ignore localStorage.json",
     "build": "rimraf ./build && tsc",
     "start:prod": "npm run build && node build/index.js"
   },

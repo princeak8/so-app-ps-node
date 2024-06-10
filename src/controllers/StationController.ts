@@ -91,8 +91,13 @@ const send = (msg:string, topic:string, wsClient:WebSocket.WebSocket) => {
 
 const sendData = (wsClient:WebSocket.WebSocket, data:string) => {
     try{
-        formatData(JSON.parse(data));
-        wsClient.send(data);
+        let companies = ["quantum", "pheonix", "starPipe"];
+        let parsedData = JSON.parse(data);
+        let formattedData = formatData(parsedData);
+        // if(companies.includes(parsedData?.id)) console.log('parsed Data', parsedData, 'formatted data:', formattedData);
+        if(formattedData != null)  wsClient.send(JSON.stringify(formattedData));
+        // wsClient.send(data);
+        // console.log(Buffer.from(JSON.stringify(formattedData)));
     }catch(err){
         logger.error(err);
     }
@@ -101,10 +106,12 @@ const sendData = (wsClient:WebSocket.WebSocket, data:string) => {
 const formatData = (data: rawStationType) => {
     let formattedData = formatStreamedData(data);
     let isAbsolute = (formattedData?.id != 'olorunsogoLines') ? true : false;
-    let total = aggregateTotal(formattedData, isAbsolute);
+    let formattedDataCopy = JSON.parse(JSON.stringify(formattedData));
+    let total = aggregateTotal(formattedDataCopy, isAbsolute);
     // if(startSendingTotalToPowerBi() && sendNewDataToPowerBi()) sendTotalToPowerBi(total);
     let started = localStorage.getItem(storage.StartedSendingTotal);
     if(startSendingTotalToPowerBi() && !started) startSendingLoop();
+    return formattedData;
     // console.log('total:',total);
 }
 

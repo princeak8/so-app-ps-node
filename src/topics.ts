@@ -35,7 +35,10 @@ const aws = [
     'shirorogs/pv', 'transamadi/tv',
     'gbaraints/pv', 'gbaraints/status',
     'zungeru/tv', 'zungeru/status',
-    'taopex/tv', 'taopex/tv'
+    'taopex/tv', 'taopex/tv',
+
+    'afl/cs', 'kamSteel/cs', 'larfarge/cs', 'monarch/cs', 'pheonix/cs',
+    'pulkitSteel/cs', 'quantum/cs', 'starPipe/cs', 'sunflag/cs', 'topSteel/cs'
 ];
 
 const topics = [...ncc, ...aws];

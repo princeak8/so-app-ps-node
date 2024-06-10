@@ -83,6 +83,10 @@ export const formatSections = (rawStationData: rawStationType): processingStatio
     //  delete rawStationData.lines;
     return {...rawStationData, sections: sectionData};
   }
+  if(rawStationData.transformers) {
+    sectionData = [...rawStationData.transformers];
+    return {...rawStationData, sections: sectionData};
+  }
   return null;
 }
 

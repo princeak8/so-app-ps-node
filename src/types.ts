@@ -36,6 +36,7 @@ export interface rawStationType {
     t: string;
     units?: rawSectionType[];
     lines?: rawSectionType[];
+    transformers?: rawSectionType[];
 }
 
 export interface dataType {
