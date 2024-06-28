@@ -5,7 +5,7 @@ import { ihovborConversion, gereguConversion, olorunsogoConversion, sapeleConver
 import { prepareNC, formatStreamedData, aggregateTotal } from '../utilities';
 import { type rawStationType, type totalType } from '../types';
 import localStorage from '../localStorage';
-import { storage } from '../enums';
+import { storage, stationId } from '../enums';
 import { getDate } from '../helpers';
 import logger from '../logger';
 
@@ -120,9 +120,10 @@ const startSendingLoop = () => {
         console.log('start sending');
             let intervalId = setInterval(() => {
                 let storageTotal: totalType | undefined = localStorage.getItem(storage.StationTotal);
+                // console.log(storageTotal);
                 if(storageTotal != undefined) {
                     let total = Object.values(storageTotal).reduce((sumTotal, curr) => sumTotal + parseFloat(curr.toString()), 0);
-                    sendTotalToPowerBi(total);
+                    sendTotalToPowerBi(total, storageTotal);
                 }
             }, 2000);
             localStorage.setItem(storage.StartedSendingTotal, true);
@@ -130,19 +131,23 @@ const startSendingLoop = () => {
         // clearInterval(intervalId);
 }
 
-const sendTotalToPowerBi = (total: number) => {
+const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) => {
     total = parseFloat(total.toFixed(2));
     let url = process.env.POWER_BI_TOTAL_API;
     let data = [
             {
                 "total_gen" :total,
-                "time" : getDate().toISOString()
+                "time" : getDate().toISOString(),
+                "egbin" : (storageTotal != undefined && storageTotal[stationId.Egbin] !== undefined) ? parseFloat(storageTotal[stationId.Egbin].toFixed(2)) : null,
+                "jebba" : (storageTotal != undefined && storageTotal[stationId.Jebba] !== undefined) ? parseFloat(storageTotal[stationId.Jebba].toFixed(2)) : null,
+                "kainji" : (storageTotal != undefined && storageTotal[stationId.Kainji] !== undefined) ? parseFloat(storageTotal[stationId.Kainji].toFixed(2)) : null
             }
         ]
+        // console.log('sending now: ', data);
     if(url != undefined) {
         axios.post(url, data)
         .then(() => {
-            // console.log('sent ', data);
+            console.log('sent ', data);
         })
         .catch((err) => {
             console.log('an error occured while sending total to powerBI '+err);
