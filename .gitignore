@@ -4,3 +4,4 @@ node_modules
 *.log
 localStorage.json
 start.bat
+mqttLocalConnect.ts
