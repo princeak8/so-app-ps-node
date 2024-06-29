@@ -12,6 +12,7 @@ import { Duplex } from "stream";
 
 import topics from "./topics";
 import mqttConnect from "./mqttConnect";
+import mqttLocalConnect from "./mqttLocalConnect";
 import logger from "./logger";
 import axios from "axios";
 import localStorage from './localStorage';
@@ -93,13 +94,23 @@ const options2 = {
     clean: true,
 };
 
+const localOptions = {
+    clientId: process.env.LOCAL_CLIENT_ID,
+    username: process.env.MQTT_LOCAL_USER,
+    password: process.env.MQTT_LOCAL_PASS,
+    clean: true,
+};
+
 const host = process.env.MQTT_HOST; //"mqtt://102.89.11.82";
 const host2 = process.env.MQTT_AWS_HOST; //"mqtt://ec2-3-88-196-213.compute-1.amazonaws.com";
+const localHost = process.env.MQTT_LOCAL_HOST; //"mqtt://localhost";
 let client = mqtt.connect(host, options);
 let client2 = mqtt.connect(host2, options2);
+let localClient = mqtt.connect(localHost, localOptions);
 
 mqttConnect(client, topics);
 mqttConnect(client2, topics);
+mqttLocalConnect(localClient);
 
 StationController.sendNccMessage(wss, client);
 StationController.sendAwsMessage(wss, client2);
@@ -109,5 +120,6 @@ localStorage.removeItems([storage.StationTotal, storage.Olorunsogo1, storage.Olo
 ]);
 localStorage.setItem(storage.StartSendingTotal, false);
 localStorage.setItem(storage.StartedSendingTotal, false);
+localStorage.setItem('localTrials', 0);
 
 server.listen("3002", async () => console.log("Server started on port 3002"));

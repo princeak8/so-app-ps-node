@@ -52,5 +52,6 @@ export enum storage {
     OlorunsogoGas = 'olorunsogoGas',
     OlorunsogoNipp = 'olorunsogoNipp',
     ReceivingDataStartTime = 'receivingDataStartTime',
-    LastSentTime = 'lastSentTime'
+    LastSentTime = 'lastSentTime',
+    Frequency = 'frequency'
 }

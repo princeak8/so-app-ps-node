@@ -23,6 +23,14 @@ StationController.sendAwsMessage= (wss:WebSocket.Server, client:Client) => {
     });
 }
 
+StationController.sendLocalMessage= (wss:WebSocket.Server, client:Client) => {
+    client.on('message', async function (sentTopic:string, message:Buffer) {
+        let vals = message.toString();
+        let data = JSON.parse(vals);
+        localStorage.setItem(storage.Frequency, data.value);
+    });
+}
+
 const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
     
     wss.clients.forEach((wsClient) => {
@@ -134,10 +142,12 @@ const startSendingLoop = () => {
 const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) => {
     total = parseFloat(total.toFixed(2));
     let url = process.env.POWER_BI_TOTAL_API;
+    let freq = localStorage.getItem(storage.Frequency);
     let data = [
             {
                 "total_gen" :total,
                 "time" : getDate().toISOString(),
+                "frequency" : (freq != undefined) ? parseFloat(freq.toFixed(2)) : null,
                 "egbin" : (storageTotal != undefined && storageTotal[stationId.Egbin] !== undefined) ? parseFloat(storageTotal[stationId.Egbin].toFixed(2)) : null,
                 "jebba" : (storageTotal != undefined && storageTotal[stationId.Jebba] !== undefined) ? parseFloat(storageTotal[stationId.Jebba].toFixed(2)) : null,
                 "kainji" : (storageTotal != undefined && storageTotal[stationId.Kainji] !== undefined) ? parseFloat(storageTotal[stationId.Kainji].toFixed(2)) : null
