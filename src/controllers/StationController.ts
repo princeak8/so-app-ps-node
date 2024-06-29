@@ -157,7 +157,7 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
     if(url != undefined) {
         axios.post(url, data)
         .then(() => {
-            console.log('sent ', data);
+            // console.log('sent ', data);
         })
         .catch((err) => {
             console.log('an error occured while sending total to powerBI '+err);
