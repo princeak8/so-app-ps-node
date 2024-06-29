@@ -25,7 +25,9 @@ StationController.sendAwsMessage= (wss:WebSocket.Server, client:Client) => {
 
 StationController.sendLocalMessage= (wss:WebSocket.Server, client:Client) => {
     client.on('message', async function (sentTopic:string, message:Buffer) {
-        sendMessage(wss, message, sentTopic);
+        let vals = message.toString();
+        let data = JSON.parse(vals);
+        localStorage.setItem(storage.Frequency, data.value);
     });
 }
 
@@ -35,8 +37,9 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
         // console.log('client ready');
         if (wsClient.readyState === WebSocket.OPEN) {
             let vals = message.toString();
-            let data = JSON.parse(vals);
-            localStorage.setItem(storage.Frequency, data.value);
+            // if(topic == 'olorunsogo2ts/tv' || topic == 'olorunsogo1ts/pv') console.log(vals);
+            // if(topic == 'shirorogs/pv') vals = Buffer.from(JSON.stringify(nc)).toString();
+            send(vals, topic, wsClient);
         }
     });
 }

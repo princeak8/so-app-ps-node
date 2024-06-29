@@ -120,5 +120,6 @@ localStorage.removeItems([storage.StationTotal, storage.Olorunsogo1, storage.Olo
 ]);
 localStorage.setItem(storage.StartSendingTotal, false);
 localStorage.setItem(storage.StartedSendingTotal, false);
+localStorage.setItem('localTrials', 0);
 
 server.listen("3002", async () => console.log("Server started on port 3002"));
