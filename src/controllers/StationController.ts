@@ -147,7 +147,8 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
             {
                 "total_gen" :total,
                 "time" : getDate().toISOString(),
-                // "frequency" : (freq != undefined) ? parseFloat(freq.toFixed(2)) : null,
+                "frequency" : (freq != undefined) ? parseFloat(freq.toFixed(2)) : null,
+                "freq_time" : getDate().toISOString(),
                 "egbin" : (storageTotal != undefined && storageTotal[stationId.Egbin] !== undefined) ? parseFloat(storageTotal[stationId.Egbin].toFixed(2)) : null,
                 "jebba" : (storageTotal != undefined && storageTotal[stationId.Jebba] !== undefined) ? parseFloat(storageTotal[stationId.Jebba].toFixed(2)) : null,
                 "kainji" : (storageTotal != undefined && storageTotal[stationId.Kainji] !== undefined) ? parseFloat(storageTotal[stationId.Kainji].toFixed(2)) : null
