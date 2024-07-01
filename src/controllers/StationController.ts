@@ -146,7 +146,7 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
     let freq = localStorage.getItem(storage.Frequency);
     let data: any = [];
     if(storageTotal != undefined) {
-        freq = (freq != undefined) ? parseFloat(freq.toFixed(2)) : null;
+        // freq = (freq != undefined) ? parseFloat(freq.toFixed(2)) : null;
         let time = getDate().toISOString();
         Object.keys(stationIds).forEach((key) => {
             let stationName = stationIds[key as keyof typeof stationIds];
