@@ -156,6 +156,10 @@ export const aggregateTotal = (stationData: stationType | null, absolute=true): 
     // return 45;
 }
 
+export const stationIdsArray = () => {
+    
+}
+
 function extractTotal (data: sectionType[]) {
     let totalMw = 0;
     let gasMw = 0;
