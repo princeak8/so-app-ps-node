@@ -3,4 +3,5 @@ node_modules
 /src/logs
 *.log
 localStorage.json
+start.bat
 mqttLocalConnect.ts
