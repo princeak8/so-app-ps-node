@@ -114,6 +114,7 @@ mqttLocalConnect(localClient);
 
 StationController.sendNccMessage(wss, client);
 StationController.sendAwsMessage(wss, client2);
+StationController.sendLocalMessage(localClient);
 
 localStorage.removeItems([storage.StationTotal, storage.Olorunsogo1, storage.Olorunsogo2,
     storage.OlorunsogoGas, storage.OlorunsogoLines, storage.OlorunsogoNipp, storage.ReceivingDataStartTime
