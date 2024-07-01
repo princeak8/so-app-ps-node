@@ -64,7 +64,7 @@ export interface totalType {
     [key: string]: number;
 }
 
-export interface powerBIPayloadType 
+// export interface powerBIPayloadType 
 
 export interface formatDataResponseType {
     formattedData: stationType;

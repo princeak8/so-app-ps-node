@@ -8,6 +8,7 @@ import localStorage from '../localStorage';
 import { storage, stationId } from '../enums';
 import { getDate } from '../helpers';
 import logger from '../logger';
+import stationIds from '../stationIds';
 
 const StationController:{ [index: string]: Function } = {};
 
@@ -143,17 +144,38 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
     total = parseFloat(total.toFixed(2));
     let url = process.env.POWER_BI_TOTAL_API;
     let freq = localStorage.getItem(storage.Frequency);
-    let data = [
-            {
-                "total_gen" :total,
-                "time" : getDate().toISOString(),
-                "frequency" : (freq != undefined) ? parseFloat(freq.toFixed(2)) : null,
-                "freq_time" : getDate().toISOString(),
-                "egbin" : (storageTotal != undefined && storageTotal[stationId.Egbin] !== undefined) ? parseFloat(storageTotal[stationId.Egbin].toFixed(2)) : null,
-                "jebba" : (storageTotal != undefined && storageTotal[stationId.Jebba] !== undefined) ? parseFloat(storageTotal[stationId.Jebba].toFixed(2)) : null,
-                "kainji" : (storageTotal != undefined && storageTotal[stationId.Kainji] !== undefined) ? parseFloat(storageTotal[stationId.Kainji].toFixed(2)) : null
+    let data: any = [];
+    if(storageTotal != undefined) {
+        freq = (freq != undefined) ? parseFloat(freq.toFixed(2)) : null;
+        let time = getDate().toISOString();
+        Object.keys(stationIds).forEach((key) => {
+            let stationName = stationIds[key as keyof typeof stationIds];
+            if(storageTotal[stationName] !== undefined) {
+                data.push(
+                    {
+                        Load: parseFloat(storageTotal[stationName].toFixed(2)),
+                        Frequency: freq,
+                        Time: time,
+                        station: stationName
+                    }
+                );
             }
-        ]
+        });
+        // data.push({
+
+        // });
+    }
+    // let data = [
+    //         {
+    //             "total_gen" :total,
+    //             "time" : getDate().toISOString(),
+    //             "frequency" : (freq != undefined) ? parseFloat(freq.toFixed(2)) : null,
+    //             "freq_time" : getDate().toISOString(),
+    //             "egbin" : (storageTotal != undefined && storageTotal[stationId.Egbin] !== undefined) ? parseFloat(storageTotal[stationId.Egbin].toFixed(2)) : null,
+    //             "jebba" : (storageTotal != undefined && storageTotal[stationId.Jebba] !== undefined) ? parseFloat(storageTotal[stationId.Jebba].toFixed(2)) : null,
+    //             "kainji" : (storageTotal != undefined && storageTotal[stationId.Kainji] !== undefined) ? parseFloat(storageTotal[stationId.Kainji].toFixed(2)) : null
+    //         }
+    //     ]
         // console.log('sending now: ', data);
     if(url != undefined) {
         axios.post(url, data)
