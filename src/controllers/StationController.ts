@@ -148,17 +148,20 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
     if(storageTotal != undefined) {
         // freq = (freq != undefined) ? parseFloat(freq.toFixed(2)) : null;
         let time = getDate().toISOString();
+        let exclude = ['Eket', 'Ekim', 'Olorunsogo1', 'Olorunsogo2', 'OlorunsogoLines', 'Zungeru', 'Omotosho1', 'Omotosho2'];
         Object.keys(stationIds).forEach((key) => {
-            let stationName = stationIds[key as keyof typeof stationIds];
-            if(storageTotal[stationName] !== undefined) {
-                data.push(
-                    {
-                        Load: parseFloat(storageTotal[stationName].toFixed(2)),
-                        Frequency: freq,
-                        Time: time,
-                        station: stationName
-                    }
-                );
+            if(!exclude.includes(key)){
+                let stationName = stationIds[key as keyof typeof stationIds];
+                if(storageTotal[stationName] !== undefined) {
+                    data.push(
+                        {
+                            Load: parseFloat(storageTotal[stationName].toFixed(2)),
+                            Frequency: freq,
+                            Time: time,
+                            station: stationName
+                        }
+                    );
+                }
             }
         });
         // data.push({
