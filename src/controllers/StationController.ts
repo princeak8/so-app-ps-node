@@ -100,7 +100,6 @@ const send = (msg:string, topic:string, wsClient:WebSocket.WebSocket) => {
 
 const sendData = (wsClient:WebSocket.WebSocket, data:string) => {
     try{
-        let companies = ["quantum", "pheonix", "starPipe"];
         let parsedData = JSON.parse(data);
         let formattedData = formatData(parsedData);
         // if(companies.includes(parsedData?.id)) console.log('parsed Data', parsedData, 'formatted data:', formattedData);
@@ -116,10 +115,13 @@ const formatData = (data: rawStationType) => {
     let formattedData = formatStreamedData(data);
     let isAbsolute = (formattedData?.id != 'olorunsogoLines') ? true : false;
     let formattedDataCopy = JSON.parse(JSON.stringify(formattedData));
-    let total = aggregateTotal(formattedDataCopy, isAbsolute);
-    // if(startSendingTotalToPowerBi() && sendNewDataToPowerBi()) sendTotalToPowerBi(total);
-    let started = localStorage.getItem(storage.StartedSendingTotal);
-    if(startSendingTotalToPowerBi() && !started) startSendingLoop();
+    let companies = ['pheonix', 'quantum', 'sunflag', 'africanFoundriesLimited', 'starPipe', 'topSteel', 'pulkitSteel', 'kamSteel', 'larfarge', 'monarch'];
+    if(!companies.includes(formattedDataCopy.id)) {
+        let total = aggregateTotal(formattedDataCopy, isAbsolute);
+        // if(startSendingTotalToPowerBi() && sendNewDataToPowerBi()) sendTotalToPowerBi(total);
+        let started = localStorage.getItem(storage.StartedSendingTotal);
+        if(startSendingTotalToPowerBi() && !started) startSendingLoop();
+    }
     return formattedData;
     // console.log('total:',total);
 }
@@ -148,14 +150,15 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
     if(storageTotal != undefined) {
         // freq = (freq != undefined) ? parseFloat(freq.toFixed(2)) : null;
         let time = getDate().toISOString();
-        let exclude = ['Eket', 'Ekim', 'Olorunsogo1', 'Olorunsogo2', 'OlorunsogoLines', 'Zungeru', 'Omotosho1', 'Omotosho2'];
+        let exclude = ['Eket', 'Ekim', 'Olorunsogo1', 'Olorunsogo2', 'OlorunsogoLines', 'Omotosho1', 'Omotosho2'];
         Object.keys(stationIds).forEach((key) => {
             if(!exclude.includes(key)){
-                let stationName = stationIds[key as keyof typeof stationIds];
-                if(storageTotal[stationName] !== undefined) {
+                let stationName = key; 
+                let stationId = stationIds[key as keyof typeof stationIds];
+                if(storageTotal[stationId] !== undefined) {
                     data.push(
                         {
-                            Load: parseFloat(storageTotal[stationName].toFixed(2)),
+                            Load: parseFloat(storageTotal[stationId].toFixed(2)),
                             Frequency: freq,
                             Time: time,
                             station: stationName
@@ -164,6 +167,28 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
                 }
             }
         });
+        if(storageTotal['Eket'] !== undefined && storageTotal['Ekim'] !== undefined) {
+            let ibomGen = storageTotal['Eket'] + storageTotal['Ekim'];
+            data.push(
+                {
+                    Load: parseFloat(ibomGen.toFixed(2)),
+                    Frequency: freq,
+                    Time: time,
+                    station: 'Ibom'
+                }
+            );
+        }
+        let omotosho1 = (storageTotal['Omotosho1'] !== undefined) ? storageTotal['Omotosho1'] : 0;
+        let omotosho2 = (storageTotal['Omotosho2'] !== undefined) ? storageTotal['Omotosho2'] : 0;
+        let omotoshoGas = omotosho1 + omotosho2;
+        data.push(
+            {
+                Load: parseFloat(omotoshoGas.toFixed(2)),
+                Frequency: freq,
+                Time: time,
+                station: 'OmotoshoGas'
+            }
+        );
         // data.push({
 
         // });

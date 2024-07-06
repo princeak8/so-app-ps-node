@@ -123,14 +123,15 @@ export const formatInnerData = (rawSectionData: rawSectionType): sectionType | n
 }
 
 export const aggregateTotal = (stationData: stationType | null, absolute=true):  number => {
-    // console.log(stationData);
+    // console.log(stationData?.id);
     const localStorageTotal = localStorage.getItem('stationTotal')
     let total: totalType = (localStorageTotal == undefined) ? {} : localStorageTotal;
     if(stationData != null) {
         const olorunsogos = ['olorunsogo1', 'olorunsogo2', 'olorunsogoLines'];
+        
         let stationArr:number[] = []; 
         let stationTotal = 0;
-        if(stationData.id != 'gereguNipp' && !olorunsogos.includes(stationData.id)) {
+        if(stationData.id != 'gereguNipp' && stationData.id != 'zungeru' && !olorunsogos.includes(stationData.id)) {
             stationData.sections.forEach((sectionData: sectionType) => {
                 // console.log(sectionData.data);
                 // stationTotal += parseFloat(sectionData.data.mw.toString());
@@ -144,6 +145,8 @@ export const aggregateTotal = (stationData: stationType | null, absolute=true): 
                     stationData.id = olorunsogo.id;
                     stationTotal = olorunsogo.value;
                 }
+            }else if(stationData.id == 'zungeru'){
+                stationTotal = zungeruFn(stationData.sections);
             }else{
                 stationTotal = extractTotal(stationData.sections);
             }
@@ -174,6 +177,20 @@ function extractTotal (data: sectionType[]) {
     });
     let mw = totalMw - gasMw;
     return mw;
+}
+
+function zungeruFn (data: sectionType[]) {
+    let totalMw = 0;
+    data.forEach((section) => {
+        let A = parseFloat(section.data.A.toString());
+        let V = parseFloat(section.data.V.toString());
+        if(!Number.isNaN(A) && !Number.isNaN(V)) {
+            // console.log('A:'+A + 'V', V);
+            let mw = (Math.sqrt(3) * (A*V))/1000;
+            totalMw += mw;
+        }
+    })
+    return totalMw;
 }
 
 function olorunsogoFn (data: stationType) {
