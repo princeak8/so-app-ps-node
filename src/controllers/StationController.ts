@@ -187,6 +187,12 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
                 Frequency: freq,
                 Time: time,
                 station: 'OmotoshoGas'
+            },
+            {
+                Load: total,
+                Frequency: freq,
+                Time: time,
+                station: 'total_gen'
             }
         );
         // data.push({
