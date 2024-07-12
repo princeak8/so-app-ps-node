@@ -131,7 +131,7 @@ export const aggregateTotal = (stationData: stationType | null, absolute=true): 
         
         let stationArr:number[] = []; 
         let stationTotal = 0;
-        if(stationData.id != 'gereguNipp' && stationData.id != 'zungeru' && !olorunsogos.includes(stationData.id)) {
+        if(stationData.id != 'gereguNipp' && !olorunsogos.includes(stationData.id)) {
             stationData.sections.forEach((sectionData: sectionType) => {
                 // console.log(sectionData.data);
                 // stationTotal += parseFloat(sectionData.data.mw.toString());
@@ -145,8 +145,6 @@ export const aggregateTotal = (stationData: stationType | null, absolute=true): 
                     stationData.id = olorunsogo.id;
                     stationTotal = olorunsogo.value;
                 }
-            }else if(stationData.id == 'zungeru'){
-                stationTotal = zungeruFn(stationData.sections);
             }else{
                 stationTotal = extractTotal(stationData.sections);
             }

@@ -40,6 +40,7 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
             let vals = message.toString();
             // if(topic == 'olorunsogo2ts/tv' || topic == 'olorunsogo1ts/pv') console.log(vals);
             // if(topic == 'shirorogs/pv') vals = Buffer.from(JSON.stringify(nc)).toString();
+            // if(topic == 'zungeru/tv') console.log(vals);
             send(vals, topic, wsClient);
         }
     });
@@ -192,7 +193,7 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
                 Load: total,
                 Frequency: freq,
                 Time: time,
-                station: 'total_gen'
+                station: 'Total Generation'
             }
         );
         // data.push({
