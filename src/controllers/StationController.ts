@@ -26,9 +26,13 @@ StationController.sendAwsMessage= (wss:WebSocket.Server, client:Client) => {
 
 StationController.sendLocalMessage= (client:Client) => {
     client.on('message', async function (sentTopic:string, message:Buffer) {
-        let vals = message.toString();
-        let data = JSON.parse(vals);
-        localStorage.setItem(storage.Frequency, data.value);
+        try{
+            let vals = message.toString();
+            let data = JSON.parse(vals);
+            localStorage.setItem(storage.Frequency, data.value);
+        }catch(err){
+            logger.error(err);
+        }
     });
 }
 
