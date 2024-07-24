@@ -141,6 +141,7 @@ const startSendingLoop = () => {
                     let total = Object.values(storageTotal).reduce((sumTotal, curr) => sumTotal + parseFloat(curr.toString()), 0);
                     sendTotalToPowerBi(total, storageTotal);
                 }
+                sendFrequencyToPowerBi();
             }, 2000);
             localStorage.setItem(storage.StartedSendingTotal, true);
         
@@ -223,6 +224,27 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
         })
         .catch((err) => {
             console.log('an error occured while sending total to powerBI '+err);
+        })
+    }
+}
+
+const sendFrequencyToPowerBi = () => {
+    let freq = localStorage.getItem(storage.Frequency);
+    let time = getDate().toISOString();
+    let url = process.env.POWER_BI_FREQ_API;
+    let data = [
+                    {
+                        "Frequency" : freq,
+                        "Time" : time
+                    }
+                ]
+    if(url != undefined) {
+        axios.post(url, data)
+        .then(() => {
+            // console.log('sent ', data);
+        })
+        .catch((err) => {
+            console.log('an error occured while sending frequency to powerBI '+err);
         })
     }
 }
