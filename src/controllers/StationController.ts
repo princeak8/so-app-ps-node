@@ -238,10 +238,11 @@ const sendFrequencyToPowerBi = () => {
                         "Time" : time
                     }
                 ]
+    console.log('sending frequency');
     if(url != undefined) {
         axios.post(url, data)
         .then(() => {
-            // console.log('sent ', data);
+            console.log('frequency sent ', data);
         })
         .catch((err) => {
             console.log('an error occured while sending frequency to powerBI '+err);
