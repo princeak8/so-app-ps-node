@@ -31,7 +31,7 @@ StationController.sendLocalMessage= (client:Client) => {
             let data = JSON.parse(vals);
             localStorage.setItem(storage.Frequency, data.value);
         }catch(err){
-            logger.error(err);
+            logger.error('error sending local message ',err);
         }
     });
 }
@@ -112,7 +112,7 @@ const sendData = (wsClient:WebSocket.WebSocket, data:string) => {
         // wsClient.send(data);
         // console.log(Buffer.from(JSON.stringify(formattedData)));
     }catch(err){
-        logger.error(err);
+        logger.error('Error sending websocket data ',err);
     }
 }
 
@@ -153,9 +153,9 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
     let url = process.env.POWER_BI_TOTAL_API;
     let freq = localStorage.getItem(storage.Frequency);
     let data: any = [];
+    let time = getDate().toISOString();
     if(storageTotal != undefined) {
         // freq = (freq != undefined) ? parseFloat(freq.toFixed(2)) : null;
-        let time = getDate().toISOString();
         let exclude = ['Eket', 'Ekim', 'Olorunsogo1', 'Olorunsogo2', 'OlorunsogoLines', 'Omotosho1', 'Omotosho2'];
         Object.keys(stationIds).forEach((key) => {
             if(!exclude.includes(key)){
@@ -223,7 +223,7 @@ const sendTotalToPowerBi = (total: number, storageTotal: totalType | undefined) 
             // console.log('sent ', data);
         })
         .catch((err) => {
-            console.log('an error occured while sending total to powerBI '+err);
+            console.log(time+': an error occured while sending total to powerBI '+err);
         })
     }
 }
@@ -245,7 +245,7 @@ const sendFrequencyToPowerBi = () => {
             console.log('frequency sent ', data);
         })
         .catch((err) => {
-            console.log('an error occured while sending frequency to powerBI '+err);
+            console.log(time+': an error occured while sending frequency to powerBI '+err);
         })
     }
 }
