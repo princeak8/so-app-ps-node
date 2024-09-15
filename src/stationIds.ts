@@ -29,6 +29,9 @@ export default {
     Taopex : 'taopex',
     Transamadi : 'phMain',
     Zungeru : 'zungeru',
+    OlorunsogoNipp: 'olorunsogoNipp',
+    OlorunsogoGas: 'olorunsogoGas',
+
 
     Eket : 'eket',
     Ekim : 'ekim',

@@ -141,10 +141,12 @@ export const aggregateTotal = (stationData: stationType | null, absolute=true): 
         }else{
             if(olorunsogos.includes(stationData.id)){
                 let olorunsogo = olorunsogoFn(stationData);
+                
                 if(olorunsogo != null) {
                     stationData.id = olorunsogo.id;
                     stationTotal = olorunsogo.value;
                 }
+                // console.log('Olorunsogo:', stationData.id, stationTotal);
             }else{
                 stationTotal = extractTotal(stationData.sections);
             }
