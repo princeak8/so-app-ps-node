@@ -238,8 +238,9 @@ function olorunsogoFn (data: stationType) {
         })
         olorunsogoLines = getTotal(totalArr, false);
         // console.log('Nipp:',)
-        olorunsogoNipp = olorunsogoLines - olorunsogoGas.value;
+        
         if(olorunsogoGas != undefined) {
+            olorunsogoNipp = olorunsogoLines - olorunsogoGas.value;
             // console.log('NIPP', olorunsogoNipp);
             // console.log('Gas', olorunsogoGas.value);
             localStorage.setItem('olorunsogoNipp', {'id': 'olorunsogoNipp', 'value': olorunsogoNipp});
