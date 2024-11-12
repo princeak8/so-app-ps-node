@@ -30,7 +30,7 @@ class LocalStorage {
     }
 
     async setItem(key, value) {
-        this.items[key] = value;
+        if(this.items) this.items[key] = value;
         this.writeItemsToLocalstorage();
     }
 
@@ -62,11 +62,15 @@ class LocalStorage {
     }
 
     writeItemsToLocalstorage() {
-        writeFileSync('localStorage.json', JSON.stringify(this.items), error => {
-            if (error) {
-                console.log('Error occurred during writing file');
-            }
-        })
+        try{
+            writeFileSync('localStorage.json', JSON.stringify(this.items), error => {
+                if (error) {
+                    console.log('Error occurred during writing file');
+                }
+            })
+        }catch(error) {
+            //
+        }
     }
 
     print() {
