@@ -30,7 +30,12 @@ class LocalStorage {
     }
 
     async setItem(key, value) {
-        if(this.items) this.items[key] = value;
+        if(this.items && this.items != undefined) {
+            this.items[key] = value;
+        }else{
+            this.items = {};
+            this.items[key] = value;
+        }
         this.writeItemsToLocalstorage();
     }
 
