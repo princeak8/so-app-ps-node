@@ -160,6 +160,7 @@ const startSendingLoop = () => {
                     let total = Object.values(storageTotal).reduce((sumTotal, curr) => sumTotal + parseFloat(curr.toString()), 0);
                     sendTotalToPowerBi(total, storageTotal);
                 }
+                // console.log("send frequency to powerBI");
                 sendFrequencyToPowerBi();
             }, 2000);
             localStorage.setItem(storage.StartedSendingTotal, true);
