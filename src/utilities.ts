@@ -87,6 +87,20 @@ export const formatSections = (rawStationData: rawStationType): processingStatio
     sectionData = [...rawStationData.transformers];
     return {...rawStationData, sections: sectionData};
   }
+  if((!rawStationData?.units && !rawStationData?.lines && !rawStationData?.transformers) ) {
+    let td:any = {};
+    if(rawStationData?.mw) td.mw = rawStationData.mw;
+    if(rawStationData?.a) td.a = rawStationData.a;
+    if(rawStationData?.A) td.a = rawStationData.A;
+    if(rawStationData?.mx) td.mx = rawStationData.mx;
+    if(rawStationData?.mvar) td.mx = rawStationData.mvar;
+    if(rawStationData?.v) td.v = rawStationData.v;
+    if(rawStationData?.V) td.V = rawStationData.V;
+    if(rawStationData?.f) td.f = rawStationData.f;
+    if(rawStationData?.pf) td.pf = rawStationData.pf;
+    let line = { id: 'line1', td: td};
+    return {...rawStationData, sections: [line]}
+  }
   return null;
 }
 

@@ -5,3 +5,4 @@ node_modules
 localStorage.json
 start.bat
 mqttLocalConnect.ts
+topicData.txt

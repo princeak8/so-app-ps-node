@@ -38,7 +38,18 @@ const aws = [
     'taopex/tv', 'taopex/tv',
 
     'afl/cs', 'kamSteel/cs', 'larfarge/cs', 'monarch/cs', 'pheonix/cs',
-    'pulkitSteel/cs', 'quantum/cs', 'starPipe/cs', 'sunflag/cs', 'topSteel/cs'
+    'pulkitSteel/cs', 'quantum/cs', 'starPipe/cs', 'ndphc/sunflag/lagos/pd', 'topSteel/cs',
+
+    //MESL
+    'mesl/zeberced/pd', 'mesl/inner-galaxy1/pd', 'mesl/inner-galaxy2/pd', 'mesl/niamey/pd',
+    'mesl/ATVL/pd', 'mesl/PSML/pd', 'mesl/gazaoua/pd', 'mesl/Kam33/pd', 
+    
+    // Taopex
+    'taopex/kamSteel/sagamu/pd', 'taopex/kamSteel/ilorin/pd', 'taopex/erKang/ilorin/pd',
+
+    //FIPL
+    'fipl/oaui/pd', 'fipl/fmpia/pd'
+    
 ];
 
 const topics = [...ncc, ...aws];

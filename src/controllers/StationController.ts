@@ -39,8 +39,11 @@ StationController.sendLocalMessage= (client:Client) => {
 const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
     // console.log('send message', message);
     // console.log('clients:', wss.clients);
-    // if(topic=='omokugs/pv') console.log(message.toString());
+    // console.log(topic);
+    // console.log(topic, message.toString());
+    // if( topic.includes('taopex/kamSteel/sagamu/pd')) console.log(message.toString());
     let preparedData = convertAndPrepareData(message.toString(), topic);
+    // if(topic=='taopex/kamSteel/sagamu/pd') console.log(preparedData);
     wss.clients.forEach((wsClient) => {
         // console.log('client ready');
         // console.log(wsClient.readyState);
@@ -49,6 +52,7 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
             // if(topic == 'zungeru/tv') console.log(vals);
             
             preparedData.forEach((data) => {
+                // if(topic=='taopex/kamSteel/ilorin/pd') console.log(data);
                 if(data != null && data != undefined) sendData(wsClient, data); 
             }) 
         }
@@ -139,7 +143,10 @@ const formatData = (data: rawStationType) => {
     let formattedData = formatStreamedData(data);
     let isAbsolute = (formattedData?.id != 'olorunsogoLines') ? true : false;
     let formattedDataCopy = JSON.parse(JSON.stringify(formattedData));
-    let companies = ['pheonix', 'quantum', 'sunflag', 'africanFoundriesLimited', 'starPipe', 'topSteel', 'pulkitSteel', 'kamSteel', 'larfarge', 'monarch'];
+    let companies = [
+            'pheonix', 'quantum', 'sunflag', 'africanFoundriesLimited', 'starPipe', 'topSteel', 'pulkitSteel', 'kamSteel', 'larfarge', 'monarch',
+            'kamSteel-Ilorin'
+        ];
     if(!companies.includes(formattedDataCopy.id)) {
         let total = aggregateTotal(formattedDataCopy, isAbsolute);
         // if(startSendingTotalToPowerBi() && sendNewDataToPowerBi()) sendTotalToPowerBi(total);
