@@ -37,8 +37,8 @@ const aws = [
     'zungeru/tv', 'zungeru/status',
     'taopex/tv', 'taopex/tv',
 
-    'afl/cs', 'kamSteel/cs', 'larfarge/cs', 'monarch/cs', 'pheonix/cs',
-    'pulkitSteel/cs', 'quantum/cs', 'starPipe/cs', 'ndphc/sunflag/lagos/pd', 'topSteel/cs',
+    'afl/cs', 'kamSteel/cs', 'larfarge/cs', 'monarch/cs', 'ndphc/phoenix/ogun/pd',
+    'ndphc/pulkit/lagos/pd', 'quantum/cs', 'starPipe/cs', 'ndphc/sunflag/lagos/pd', 'topSteel/cs',
 
     //MESL
     'mesl/zeberced/pd', 'mesl/inner-galaxy1/pd', 'mesl/inner-galaxy2/pd', 'mesl/niamey/pd',
