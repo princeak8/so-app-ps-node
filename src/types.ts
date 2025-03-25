@@ -37,6 +37,16 @@ export interface rawStationType {
     units?: rawSectionType[];
     lines?: rawSectionType[];
     transformers?: rawSectionType[];
+
+    mw?: string;
+    v?: string;
+    V?: string;
+    a?: string;
+    A?: string;
+    mvar?: string;
+    mx?: string;
+    pf?: string;
+    f?: string;
 }
 
 export interface dataType {
