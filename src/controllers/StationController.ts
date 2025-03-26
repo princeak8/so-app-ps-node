@@ -41,7 +41,7 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
     // console.log('clients:', wss.clients);
     // console.log(topic);
     // console.log(topic, message.toString());
-    // if( topic.includes('taopex/kamSteel/sagamu/pd')) console.log(message.toString());
+    // if( topic.includes('ndphc/phoenix/ogun/pd')) console.log(message.toString());
     let preparedData = convertAndPrepareData(message.toString(), topic);
     // if(topic=='taopex/kamSteel/sagamu/pd') console.log(preparedData);
     wss.clients.forEach((wsClient) => {
