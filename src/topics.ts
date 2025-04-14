@@ -39,6 +39,7 @@ const aws = [
 
     'afl/cs', 'kamSteel/cs', 'larfarge/cs', 'monarch/cs', 'ndphc/phoenix/ogun/pd',
     'ndphc/pulkit/lagos/pd', 'quantum/cs', 'starPipe/cs', 'ndphc/sunflag/lagos/pd', 'topSteel/cs',
+    'bilateral/ikejaWest-sakate/lagos/pd',
 
     //MESL
     'mesl/zeberced/pd', 'mesl/inner-galaxy1/pd', 'mesl/inner-galaxy2/pd', 'mesl/niamey/pd',
