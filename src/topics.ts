@@ -35,7 +35,7 @@ const aws = [
     'shirorogs/pv', 'transamadi/tv',
     'gbaraints/pv', 'gbaraints/status',
     'zungeru/tv', 'zungeru/status',
-    'taopex/tv', 'taopex/tv',
+    'taopex/tv', 
 
     'afl/cs', 'kamSteel/cs', 'larfarge/cs', 'monarch/cs', 'ndphc/phoenix/ogun/pd',
     'ndphc/pulkit/lagos/pd', 'quantum/cs', 'starPipe/cs', 'ndphc/sunflag/lagos/pd', 'topSteel/cs',
@@ -43,7 +43,7 @@ const aws = [
 
     //MESL
     'mesl/zeberced/pd', 'mesl/inner-galaxy1/pd', 'mesl/inner-galaxy2/pd', 'mesl/niamey/pd',
-    'mesl/ATVL/pd', 'mesl/PSML/pd', 'mesl/gazaoua/pd', 'mesl/Kam33/pd', 
+    'mesl/ATVL/pd', 'mesl/PSML/pd', 'mesl/gazaoua/pd', 'mesl/Kam33/pd', 'mesl/amil/pd', 'mesl/aenl/pd',
     
     // Taopex
     'taopex/kamSteel/sagamu/pd', 'taopex/kamSteel/ilorin/pd', 'taopex/erKang/ilorin/pd',
