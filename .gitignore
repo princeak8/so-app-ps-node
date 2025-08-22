@@ -6,3 +6,8 @@ localStorage.json
 start.bat
 mqttLocalConnect.ts
 topicData.txt
+decrypt copy.js
+.env copy
+.env.enc
+.env.ncc
+decrypt.js
