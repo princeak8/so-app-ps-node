@@ -17,6 +17,7 @@ import logger from "./logger";
 import axios from "axios";
 import localStorage from './localStorage';
 import { storage } from './enums';
+require("../decrypt");
 
 const wss = new WebSocket.Server({ noServer: true });
 
