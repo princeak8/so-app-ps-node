@@ -1,26 +1,37 @@
 import * as WebSocket from 'ws';
 import { Client } from "mqtt";
 import axios from "axios";
+import { jsonrepair } from 'jsonrepair';
 import { ihovborConversion, gereguConversion, olorunsogoConversion, sapeleConversion, odukpaniConversion } from '../conversions';
-import { prepareNC, formatStreamedData, aggregateTotal } from '../utilities';
+import { prepareNC, formatStreamedData, aggregateTotal, repairJSON } from '../utilities';
 import { stationType, type rawStationType, type totalType } from '../types';
 import localStorage from '../localStorage';
 import { storage, stationId } from '../enums';
 import { getDate } from '../helpers';
 import logger from '../logger';
 import stationIds from '../stationIds';
+import { MergeStationController } from './MergeStationController';
 
 const StationController:{ [index: string]: Function } = {};
+const mergedStationController = new MergeStationController();
 
 StationController.sendNccMessage= (wss:WebSocket.Server, client:Client) => {
     client.on('message', async function (sentTopic:string, message:Buffer) {
-        sendMessage(wss, message, sentTopic);
+        if(message.toString() != 'NC') {
+            sendMessage(wss, message, sentTopic);
+        }else{
+            console.log('message:', message.toString());
+        }
     });
 }
 
 StationController.sendAwsMessage= (wss:WebSocket.Server, client:Client) => {
     client.on('message', async function (sentTopic:string, message:Buffer) {
-        sendMessage(wss, message, sentTopic);
+        if(message.toString() != 'NC') {
+            sendMessage(wss, message, sentTopic);
+        }else{
+            console.log('message:', message.toString());
+        }
     });
 }
 
@@ -41,9 +52,9 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
     // console.log('clients:', wss.clients);
     // console.log(topic);
     // console.log(topic, message.toString());
-    // if( topic.includes('mesl/aenl/pd')) console.log(message.toString());
+    // if( topic.includes('sapelets/pv')) console.log(message.toString());
     let preparedData = convertAndPrepareData(message.toString(), topic);
-    // if(topic=='taopex/kamSteel/sagamu/pd') console.log(preparedData);
+    // if(topic=='mesl/aenl/pd') console.log(preparedData);
     wss.clients.forEach((wsClient) => {
         // console.log('client ready');
         // console.log(wsClient.readyState);
@@ -69,7 +80,7 @@ const convertAndPrepareData = (msg:string, topic:string) => {
                 let ihovborArr = ihovborConversion(msg);
                 if(ihovborArr.length > 0) {
                     ihovborArr.forEach((vals) => {
-                        preparedData.push(prepareData(vals));
+                        preparedData.push(prepareData(vals, topic));
                     }); 
                     break;
                 }
@@ -77,7 +88,7 @@ const convertAndPrepareData = (msg:string, topic:string) => {
                 let gereguArr = gereguConversion(msg);
                 if(gereguArr.length > 0) {
                     gereguArr.forEach((vals) => {
-                        preparedData.push(prepareData(vals));
+                        preparedData.push(prepareData(vals, topic));
                     }); 
                     break; 
                 }
@@ -85,7 +96,7 @@ const convertAndPrepareData = (msg:string, topic:string) => {
                 let olorunsogoArr = olorunsogoConversion(msg);
                 if(olorunsogoArr.length > 0) {
                     olorunsogoArr.forEach((vals) => {
-                        preparedData.push(prepareData(vals));
+                        preparedData.push(prepareData(vals, topic));
                     }); 
                     break;
                 }
@@ -93,7 +104,7 @@ const convertAndPrepareData = (msg:string, topic:string) => {
                 let sapeleArr = sapeleConversion(msg);
                 if(sapeleArr.length > 0) {
                     sapeleArr.forEach((vals) => {
-                        preparedData.push(prepareData(vals));
+                        preparedData.push(prepareData(vals, topic));
                     }); 
                     break;
                 }
@@ -101,13 +112,27 @@ const convertAndPrepareData = (msg:string, topic:string) => {
                 let odukpaniArr = odukpaniConversion(msg);
                 if(odukpaniArr.length > 0) {
                     odukpaniArr.forEach((vals) => {
-                        preparedData.push(prepareData(vals));
+                        preparedData.push(prepareData(vals, topic));
                     }); 
                     break;
                 }
             default:
-                preparedData.push(prepareData(msg));
-                // return prepareData(msg);
+                if(topic.includes('ps/sapele')) {
+                    let data = repairJSON(msg);
+                    // if(topic.includes('ps/sapele')) console.log("repaired data:", data);
+                    let parsedData = JSON.parse(data);
+                    mergedStationController.processIncomingStream(parsedData);
+                    const mergedSapeleData = mergedStationController.getStationData("sapele");
+                    if(mergedSapeleData != null) {
+                        // console.log("merged String:", JSON.stringify(mergedSapeleData));
+                        const sapeleData = prepareData(JSON.stringify(mergedSapeleData), topic);
+                        // console.log("mergedSapele:", sapeleData);
+                        preparedData.push(sapeleData);
+                    }
+                }else{
+                    preparedData.push(prepareData(msg, topic));
+                    // return prepareData(msg);
+                }
         }
         return preparedData;
     // }else{
@@ -116,12 +141,19 @@ const convertAndPrepareData = (msg:string, topic:string) => {
     // }
 }
 
-const prepareData = (data:string): stationType | null => {
+const prepareData = (data:string, topic: string = ''): stationType | null => {
     try{
+        // if(topic.includes('ps/sapele')) console.log("data:", data);
+        // data = jsonrepair(data);
+        data = repairJSON(data);
+        // if(topic.includes('ps/sapele')) console.log("repaired data:", data);
         let parsedData = JSON.parse(data);
+        // if(topic.includes('egbings/pv')) console.log("parsed Data",parsedData);
         let formattedData = formatData(parsedData);
         return formattedData;
     }catch(err){
+        console.log('prepare Data Error for '+topic, err);
+        console.log(data);
         logger.error('Error sending websocket data ',err);
         return null;
     }

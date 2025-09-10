@@ -11,3 +11,6 @@ decrypt copy.js
 .env.enc
 .env.ncc
 decrypt.js
+app copy.ts
+app.ts copy
+src/mqttBootstrap copy.js

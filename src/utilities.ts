@@ -76,6 +76,7 @@ export const formatSections = (rawStationData: rawStationType): processingStatio
   if(rawStationData.units) {
      sectionData = [...rawStationData.units];
     //  delete rawStationData.units;
+    // console.log("formatted section:", {...rawStationData, sections: sectionData});
      return {...rawStationData, sections: sectionData};
   }
   if(rawStationData.lines) {
@@ -126,6 +127,7 @@ export const formatInnerData = (rawSectionData: rawSectionType): sectionType | n
     if(rawSectionData.pd) {
       dt = {...rawSectionData.pd};
       // delete rawSectionData.pd;
+    //   console.log("formatted Inner Data:", {...rawSectionData, data: dt});
       return {...rawSectionData, data: dt};
     }
     if(rawSectionData.gd) {
@@ -261,5 +263,44 @@ function olorunsogoFn (data: stationType) {
             return {'id': 'olorunsogoNipp', 'value': olorunsogoNipp};
         }
     } 
+}
+
+export const repairJSON = (jsonString: string): any => {
+    try {
+        // First try parsing as-is
+        let fixedJson = JSON.parse(jsonString);
+        return jsonString;
+    } catch (error) {
+        // Try common fixes
+        let fixed = jsonString.trim();
+        
+        // Add missing opening brace
+        if (!fixed.startsWith('{') && !fixed.startsWith('[')) {
+            fixed = '{' + fixed;
+        }
+        
+        // Add missing closing brace
+        if (!fixed.endsWith('}') && !fixed.endsWith(']')) {
+            if (fixed.startsWith('{')) {
+                fixed = fixed + '}';
+            } else if (fixed.startsWith('[')) {
+                fixed = fixed + ']';
+            }
+        }
+        
+        // Remove trailing commas
+        fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
+        
+        // Fix unquoted keys (basic regex - may need refinement)
+        fixed = fixed.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
+        
+        try {
+            let fixedJson = JSON.parse(fixed);
+            return fixed;
+        } catch (secondError: any) {
+            // console.log(`Cannot repair JSON: ${secondError.message}`);
+            throw new Error(`Cannot repair JSON: ${secondError.message}`);
+        }
+    }
 }
 
