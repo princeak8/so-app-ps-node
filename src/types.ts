@@ -7,6 +7,15 @@ export interface dataType {
     mvar: number | string;
 }
 
+export interface newDatatype {
+    mw: string;
+    v: string;
+    a: string;
+    mx?: string;
+    pf?: string;
+    f?: string;
+}
+
 export interface sectionType {
     id: string;
     data: dataType;
@@ -47,13 +56,6 @@ export interface rawStationType {
     mx?: string;
     pf?: string;
     f?: string;
-}
-
-export interface dataType {
-    mw: number | string;
-    A: number | string;
-    V: number | string;
-    mvar: number | string;
 }
 
 export interface unitType {
