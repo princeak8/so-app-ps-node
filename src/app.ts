@@ -20,8 +20,6 @@ import { storage } from './enums';
 require("../decrypt");
 import { host, host2, localHost, options, options2, localOptions } from './mqttBootstrap';
 
-console.log("options2:", options2);
-
 const wss = new WebSocket.Server({ noServer: true });
 
 const app = express();
