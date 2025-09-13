@@ -7,20 +7,26 @@ import { prepareNC, formatStreamedData, aggregateTotal, repairJSON } from '../ut
 import { stationType, type rawStationType, type totalType } from '../types';
 import localStorage from '../localStorage';
 import { storage, stationId } from '../enums';
-import { getDate } from '../helpers';
+import { getDate, getMergeStationId } from '../helpers';
 import logger from '../logger';
 import stationIds from '../stationIds';
 import { MergeStationController } from './MergeStationController';
 
 const StationController:{ [index: string]: Function } = {};
-const mergedStationController = new MergeStationController();
+const mergeIds = {
+    'sapele': ['sapele-gas', 'sapele-steam'],
+    'deltaGs': ['delta4-1', 'delta4-2']
+};
+const mergedStationController = new MergeStationController(mergeIds);
+
+console.log("done initializing");
 
 StationController.sendNccMessage= (wss:WebSocket.Server, client:Client) => {
     client.on('message', async function (sentTopic:string, message:Buffer) {
         if(message.toString() != 'NC') {
             sendMessage(wss, message, sentTopic);
         }else{
-            console.log('message:', message.toString());
+            // console.log('message:', message.toString());
         }
     });
 }
@@ -51,8 +57,10 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
     // console.log('send message', message);
     // console.log('clients:', wss.clients);
     // console.log(topic);
-    // console.log(topic, message.toString());
-    // if( topic.includes('sapelets/pv')) console.log(message.toString());
+    // if(topic.includes('ps/delta')) console.log(topic, message.toString());
+    // if(topic.includes('ps/delta3/gas/Delta/pd')) console.log(topic, message.toString());
+    // if(topic.includes('ps/delta4-2/gas/Delta/pd')) console.log(topic, message.toString());
+    // if( topic.includes('ps/sapele')) console.log(message.toString());
     let preparedData = convertAndPrepareData(message.toString(), topic);
     // if(topic=='mesl/aenl/pd') console.log(preparedData);
     wss.clients.forEach((wsClient) => {
@@ -71,6 +79,7 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
 }
 
 const convertAndPrepareData = (msg:string, topic:string) => {
+    let mergeTopics = ['ps/sapele', 'ps/delta4-1/gas/Delta/pd', 'ps/delta4-2/gas/Delta/pd'];
     // if(topic == 'shirorogs/pv') console.log(msg);
     // console.log('send:', msg);
     // if(!topic.toLowerCase().includes('/status')) {
@@ -117,17 +126,23 @@ const convertAndPrepareData = (msg:string, topic:string) => {
                     break;
                 }
             default:
-                if(topic.includes('ps/sapele')) {
+                if (mergeTopics.some(mergeTopic => topic.includes(mergeTopic))) {
                     let data = repairJSON(msg);
                     // if(topic.includes('ps/sapele')) console.log("repaired data:", data);
                     let parsedData = JSON.parse(data);
+                    let subStationId = (parsedData.id) ? parsedData.id : parsedData.name;
+                    const stationId = getMergeStationId(subStationId, mergedStationController.mergeIds);
+
                     mergedStationController.processIncomingStream(parsedData);
-                    const mergedSapeleData = mergedStationController.getStationData("sapele");
-                    if(mergedSapeleData != null) {
-                        // console.log("merged String:", JSON.stringify(mergedSapeleData));
-                        const sapeleData = prepareData(JSON.stringify(mergedSapeleData), topic);
-                        // console.log("mergedSapele:", sapeleData);
-                        preparedData.push(sapeleData);
+                    if(stationId) {
+                        // console.log('its station Id:', stationId);
+                        const mergedData = mergedStationController.getStationData(stationId);
+                        // console.log("merged Data:", mergedData);
+                        if(mergedData != null) {
+                            const data = prepareData(JSON.stringify(mergedData), topic);
+                            // console.log("data:", data);
+                            preparedData.push(data);
+                        }
                     }
                 }else{
                     preparedData.push(prepareData(msg, topic));
