@@ -30,6 +30,7 @@ interface SourceData {
 
 interface StreamData {
     id: string;
+    name?: string;
     units: Unit[];
     time: string;
 }
@@ -41,10 +42,13 @@ class MergeStationController {
     private data: StationDataMap;
     private mergeGroups: MergeGroupConfig;
 
-    constructor() {
+    public mergeIds: Object 
+
+    constructor(mergeIds: Object) {
         // Use in-memory storage instead of localStorage
         this.data = new Map<string, InternalStationData>();
         this.mergeGroups = new Map<string, string[]>();
+        this.mergeIds = mergeIds;
         
         // Define merge groups - stations that should be combined
         this.defineMergeGroups();
@@ -54,9 +58,22 @@ class MergeStationController {
     }
 
     private defineMergeGroups(): void {
+        for (let topicId in this.mergeIds) {
+            const unitsId = (this.mergeIds as any)[topicId];
+            // const unitsId = this.mergeIds[topicId];
+            // console.log(`Key: ${topicId}`);
+            // console.log(`Array: ${unitsId}`);
+            
+            // Loop through the array
+            this.mergeGroups.set(topicId, unitsId)
+        }
+        console.log("merge Groups:", this.mergeGroups);
         // Define which station IDs should be merged together
         // Format: merged_name -> [array of source IDs]
-        this.mergeGroups.set('sapele', ['sapele-gas', 'sapele-steam']);
+
+        // this.mergeGroups.set('sapele', ['sapele-gas', 'sapele-steam']);
+        // this.mergeGroups.set('deltaGs', ['delta4-1', 'delta4-2']);
+
         // this.mergeGroups.set('olorunsogo', ['olorunsogo-gas', 'olorunsogo-steam']);
         // Add more merge groups as needed
     }
@@ -103,9 +120,11 @@ class MergeStationController {
 
     public processIncomingStream(streamData: StreamData): StationData | null {
         try {
-            const { id, units, time } = streamData;
+            let { id, name, units, time } = streamData;
             
             // Check if this station should be merged with others
+            let findId = (id) ? id : name;
+            if(findId) id = findId;
             const mergeGroupName = this.findMergeGroup(id);
             
             if (mergeGroupName) {
@@ -208,8 +227,24 @@ class MergeStationController {
     // Get current data for a station
     public getStationData(stationId: string): StationData | null {
         const data = this.data.get(stationId);
+        // console.log("gets station Data:", this.data);
         return data ? this.cleanStationData(data) : null;
     }
+
+    // public getAnyStationData(): StationData | null {
+    //     for (let topicId in this.mergeIds) {
+    //         const unitsId = (this.mergeIds as any)[topicId];
+    //         // const unitsId = this.mergeIds[topicId];
+    //         // console.log(`Key: ${topicId}`);
+    //         // console.log(`Array: ${unitsId}`);
+            
+    //         // Loop through the array
+    //         this.mergeGroups.set(topicId, unitsId)
+    //     }
+
+    //     const data = this.data.get(stationId);
+    //     return data ? this.cleanStationData(data) : null;
+    // }
 
     // Get all current data
     public getAllData(): Record<string, StationData> {

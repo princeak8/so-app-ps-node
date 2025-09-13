@@ -49,3 +49,14 @@ export const getDate = (adjustOffset:boolean = true) => {
     let adjustedDate = new Date(date.getTime() + adjustedOffset * 60 * 1000);
     return adjustedDate;
 }
+
+export const getMergeStationId = (subId: string, mergeIds: Object) => {
+    let stationId = null;
+    for (let topicId in mergeIds) {
+        const unitsId = (mergeIds as any)[topicId];
+        if (unitsId && unitsId.includes(subId)) {
+            return topicId;
+        }
+    }
+    return null;
+}
