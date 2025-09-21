@@ -1,25 +1,49 @@
 import * as WebSocket from 'ws';
 import { Client } from "mqtt";
 import axios from "axios";
+require('dotenv').config();
 import { jsonrepair } from 'jsonrepair';
 import { ihovborConversion, gereguConversion, olorunsogoConversion, sapeleConversion, odukpaniConversion } from '../conversions';
 import { prepareNC, formatStreamedData, aggregateTotal, repairJSON } from '../utilities';
 import { stationType, type rawStationType, type totalType } from '../types';
 import localStorage from '../localStorage';
-import { storage, stationId } from '../enums';
+import { storage, stationId, companyId } from '../enums';
 import { getDate, getMergeStationId } from '../helpers';
 import logger from '../logger';
 import stationIds from '../stationIds';
+
 import { MergeStationController } from './MergeStationController';
 
+const companyIds = Object.values(companyId);
+// console.log("companysId:", companyIds);
+const PowerDataQueue = require('../PowerDataQueue');
+
 const StationController:{ [index: string]: Function } = {};
+const dataQueue = new PowerDataQueue({
+    apiBaseUrl: process.env.API_BASE_URL,
+    batchSize: 100,
+    flushInterval: 30000, // 30 seconds
+    maxRetries: 3,
+    enableLogging: true,
+    // Stations that should save detailed unit data (others will only save total load)
+    stationsWithUnitData: [
+        stationIds.Sapele, stationIds.Egbin, stationIds.Delta4, stationIds.Delta3, stationIds.Delta2, stationIds.AfamIII,
+        stationIds.AfamIV, stationIds.AfamV, stationIds.AfamVI 
+    ] // Example station IDs
+});
+
+// Handle graceful shutdown
+// process.on('SIGINT', StationController.handleShutdown.bind(this));
+// process.on('SIGTERM', StationController.handleShutdown.bind(this));
+
 const mergeIds = {
     'sapele': ['sapele-gas', 'sapele-steam'],
-    'deltaGs': ['delta4-1', 'delta4-2']
+    'deltaGs': ['delta4-1', 'delta4-2'],
+    'omotoshoGas': ['omotosho1', 'omotosho2']
 };
 const mergedStationController = new MergeStationController(mergeIds);
 
-console.log("done initializing");
+// console.log("done initializing");
 
 StationController.sendNccMessage= (wss:WebSocket.Server, client:Client) => {
     client.on('message', async function (sentTopic:string, message:Buffer) {
@@ -57,12 +81,28 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
     // console.log('send message', message);
     // console.log('clients:', wss.clients);
     // console.log(topic);
-    // if(topic.includes('ps/delta')) console.log(topic, message.toString());
-    // if(topic.includes('ps/delta3/gas/Delta/pd')) console.log(topic, message.toString());
-    // if(topic.includes('ps/delta4-2/gas/Delta/pd')) console.log(topic, message.toString());
+    // if(topic.includes('sapelets/pv')) console.log(topic, message.toString());
+    // if(topic.includes('omotoso2ts/tv')) console.log(topic, message.toString());
     // if( topic.includes('ps/sapele')) console.log(message.toString());
     let preparedData = convertAndPrepareData(message.toString(), topic);
     // if(topic=='mesl/aenl/pd') console.log(preparedData);
+
+    // Process each data item for persistence BEFORE sending to WebSocket
+    const persistencePromises = preparedData.map(data => {
+        let id = data?.id ? data.id : (data as any)?.name;
+        // if(!companyIds.includes(id as companyId)) console.log(id);
+        if (data != null && data != undefined && !companyIds.includes(id as companyId)) {
+            // Queue data for persistence asynchronously (non-blocking)
+            return dataQueue.queuePowerData(data).catch((Error: any) => {
+                console.error('Error queuing data for persistence:', Error);
+                // Don't throw - we still want to send to WebSocket even if persistence fails
+            });
+        }
+        return Promise.resolve();
+    });
+    // Start persistence operations (don't wait for them to complete)
+    Promise.all(persistencePromises);
+
     wss.clients.forEach((wsClient) => {
         // console.log('client ready');
         // console.log(wsClient.readyState);
@@ -71,7 +111,7 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
             // if(topic == 'zungeru/tv') console.log(vals);
             
             preparedData.forEach((data) => {
-                // if(topic=='taopex/kamSteel/ilorin/pd') console.log(data);
+                // if(topic=='ps/delta2/gas/delta/pd' && data) console.log(data.sections[0].data);
                 if(data != null && data != undefined) sendData(wsClient, data); 
             }) 
         }
@@ -79,8 +119,9 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
 }
 
 const convertAndPrepareData = (msg:string, topic:string) => {
-    let mergeTopics = ['ps/sapele', 'ps/delta4-1/gas/Delta/pd', 'ps/delta4-2/gas/Delta/pd'];
-    // if(topic == 'shirorogs/pv') console.log(msg);
+    let mergeTopics = ['ps/sapele', 'ps/delta4-1/gas/Delta/pd', 'ps/delta4-2/gas/Delta/pd', 'omotoso11ts/pv', 'omotoso12ts/pv',];
+    // if(topic == 'omotoso11ts/pv') console.log(msg);
+    //  if(topic == 'omotoso12ts/pv') console.log(msg);
     // console.log('send:', msg);
     // if(!topic.toLowerCase().includes('/status')) {
         let preparedData = [];
@@ -140,7 +181,7 @@ const convertAndPrepareData = (msg:string, topic:string) => {
                         // console.log("merged Data:", mergedData);
                         if(mergedData != null) {
                             const data = prepareData(JSON.stringify(mergedData), topic);
-                            // console.log("data:", data);
+                            // if( data && data.id == 'omotoshoGas') console.log("data:", data);
                             preparedData.push(data);
                         }
                     }

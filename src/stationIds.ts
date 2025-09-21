@@ -1,7 +1,8 @@
 export default {
+    AfamIII: 'afamIIIPs',
     AfamIV : 'afamIv_vPs',
     AfamV : 'afamVPs',
-    AfamVI : 'afamViTs',
+    AfamVI : 'afamVIPs',
     Alaoji : 'alaoji',
     Azura : 'azuraIppPs',
     Dadinkowa : 'dadinKowaGs',
@@ -24,7 +25,7 @@ export default {
     ParasEnergy : 'parasEnergyPs',
     RiversIpp : 'riversIppPs',
     SapeleNipp : 'sapeleNipp',
-    SapeleSteam : 'sapeleSteam',
+    Sapele : 'sapele',
     Shiroro : 'shiroroPs',
     Taopex : 'taopex',
     Transamadi : 'phMain',
