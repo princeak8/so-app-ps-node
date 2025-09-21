@@ -16,10 +16,14 @@ const ncc = [
 ];
 
 const aws = [
-    'afam4gs/pv',
-    'afam5gs/pv', 'afam5gs/status',
-    'afam6ts/tv', 'afam6ts/status',
-    'delta2gs/pv',
+    'ps/afam3/gas/rivers/pd',
+    'ps/afam4/gas/rivers/pd',
+    'ps/afam5/gas/rivers/pd',
+    'ps/afam6/gas/rivers/pd',
+    // 'afam4gs/pv',
+    // 'afam5gs/pv', 'afam5gs/status',
+    // 'afam6ts/tv', 'afam6ts/status',
+    // 'delta2gs/pv',
     'ps/delta2/gas/delta/pd',
     'ps/delta3/gas/Delta/pd',
     'ps/delta4-1/gas/Delta/pd',

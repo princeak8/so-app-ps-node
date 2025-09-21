@@ -1,3 +1,5 @@
+export { companyId } from "./companyIds";
+
 export enum stationId {
     AfamIV = 'afamIv_vPs',
     AfamV = 'afamVPs',

@@ -28,12 +28,35 @@ interface SourceData {
     time: string;
 }
 
+// Add interfaces for the incoming data format
+interface GeneratorData {
+    mw: number;
+    A: number;
+    V: number;
+    mvar: number;
+}
+
+interface Line {
+    id: string;
+    gd: GeneratorData;
+}
+
+interface IncomingStreamData {
+    id: string;
+    t: string;
+    lines: Line[];
+}
+
+// Keep the original StreamData interface for backward compatibility
 interface StreamData {
     id: string;
     name?: string;
     units: Unit[];
     time: string;
 }
+
+// Union type for both data formats
+type FlexibleStreamData = StreamData | IncomingStreamData;
 
 type MergeGroupConfig = Map<string, string[]>;
 type StationDataMap = Map<string, InternalStationData>;
@@ -60,38 +83,13 @@ class MergeStationController {
     private defineMergeGroups(): void {
         for (let topicId in this.mergeIds) {
             const unitsId = (this.mergeIds as any)[topicId];
-            // const unitsId = this.mergeIds[topicId];
-            // console.log(`Key: ${topicId}`);
-            // console.log(`Array: ${unitsId}`);
-            
-            // Loop through the array
             this.mergeGroups.set(topicId, unitsId)
         }
-        console.log("merge Groups:", this.mergeGroups);
-        // Define which station IDs should be merged together
-        // Format: merged_name -> [array of source IDs]
-
-        // this.mergeGroups.set('sapele', ['sapele-gas', 'sapele-steam']);
-        // this.mergeGroups.set('deltaGs', ['delta4-1', 'delta4-2']);
-
-        // this.mergeGroups.set('olorunsogo', ['olorunsogo-gas', 'olorunsogo-steam']);
-        // Add more merge groups as needed
     }
 
     private loadExistingData(): void {
-        // In a real implementation with localStorage, you would:
-        // const stored = localStorage.getItem('powerPlantData');
-        // if (stored) {
-        //     try {
-        //         const parsedData = JSON.parse(stored);
-        //         this.data = new Map(Object.entries(parsedData));
-        //     } catch (error) {
-        //         console.error('Error loading stored data:', error);
-        //     }
-        // }
-        
+        // In a real implementation with localStorage, you would load data here
         // For now, initialize with empty data
-        // console.log('Data manager initialized');
     }
 
     private saveData(): Record<string, StationData> {
@@ -106,25 +104,73 @@ class MergeStationController {
             };
         }
         
-        // In a real implementation with localStorage:
-        // try {
-        //     localStorage.setItem('powerPlantData', JSON.stringify(dataObj));
-        // } catch (error) {
-        //     console.error('Error saving data to localStorage:', error);
-        // }
-        
-        // For demonstration, just log the data
-        // console.log('Data saved:', dataObj);
         return dataObj;
     }
 
-    public processIncomingStream(streamData: StreamData): StationData | null {
+    // Helper method to check if data is in the new format
+    private isIncomingStreamData(data: FlexibleStreamData): data is IncomingStreamData {
+        return 'lines' in data && 't' in data;
+    }
+
+    // Helper method to normalize incoming data to standard format
+    private normalizeStreamData(data: FlexibleStreamData): StreamData {
+        if (this.isIncomingStreamData(data)) {
+            // Convert new format to standard format
+            const units: Unit[] = data.lines.map(line => ({
+                id: line.id,
+                pd: {
+                    mw: line.gd.mw.toString(),
+                    a: line.gd.A.toString(),
+                    v: line.gd.V.toString(),
+                    mx: line.gd.mvar.toString(), // Using mvar for mx
+                    pf: "0.0", // Default value since not provided
+                    f: "50.0"  // Default frequency
+                }
+            }));
+
+            return {
+                id: data.id,
+                units: units,
+                time: this.parseTime(data.t)
+            };
+        } else {
+            // Already in standard format
+            return data as StreamData;
+        }
+    }
+
+    // Helper method to parse time string to ISO format
+    private parseTime(timeStr: string): string {
         try {
-            let { id, name, units, time } = streamData;
+            // If it's just time (like "9:58:29"), assume it's today
+            if (timeStr.match(/^\d{1,2}:\d{2}:\d{2}$/)) {
+                const today = new Date();
+                const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+                today.setHours(hours, minutes, seconds, 0);
+                return today.toISOString();
+            }
+            
+            // If it's already a valid date string, parse it
+            const parsed = new Date(timeStr);
+            if (!isNaN(parsed.getTime())) {
+                return parsed.toISOString();
+            }
+            
+            // Fallback to current time
+            return new Date().toISOString();
+        } catch (error) {
+            console.warn('Error parsing time string:', timeStr, error);
+            return new Date().toISOString();
+        }
+    }
+
+    public processIncomingStream(streamData: FlexibleStreamData): StationData | null {
+        try {
+            // Normalize the data to standard format
+            const normalizedData = this.normalizeStreamData(streamData);
+            const { id, units, time } = normalizedData;
             
             // Check if this station should be merged with others
-            let findId = (id) ? id : name;
-            if(findId) id = findId;
             const mergeGroupName = this.findMergeGroup(id);
             
             if (mergeGroupName) {
@@ -227,24 +273,8 @@ class MergeStationController {
     // Get current data for a station
     public getStationData(stationId: string): StationData | null {
         const data = this.data.get(stationId);
-        // console.log("gets station Data:", this.data);
         return data ? this.cleanStationData(data) : null;
     }
-
-    // public getAnyStationData(): StationData | null {
-    //     for (let topicId in this.mergeIds) {
-    //         const unitsId = (this.mergeIds as any)[topicId];
-    //         // const unitsId = this.mergeIds[topicId];
-    //         // console.log(`Key: ${topicId}`);
-    //         // console.log(`Array: ${unitsId}`);
-            
-    //         // Loop through the array
-    //         this.mergeGroups.set(topicId, unitsId)
-    //     }
-
-    //     const data = this.data.get(stationId);
-    //     return data ? this.cleanStationData(data) : null;
-    // }
 
     // Get all current data
     public getAllData(): Record<string, StationData> {
@@ -326,101 +356,6 @@ class MergeStationController {
     }
 }
 
-// Usage example
-// const dataManager = new MergeStationController();
-
-// Example 1: Process sapele-gas data
-// const sapeleGasData: StreamData = {
-//     id: "sapele-gas",
-//     units: [
-//         {
-//             id: "pb202",
-//             pd: {
-//                 mw: "45.2",
-//                 a: "120.5",
-//                 v: "415.0",
-//                 mx: "50.0",
-//                 pf: "0.85",
-//                 f: "50.1"
-//             }
-//         },
-//         {
-//             id: "pb203",
-//             pd: {
-//                 mw: "52.1",
-//                 a: "135.2",
-//                 v: "414.8",
-//                 mx: "60.0",
-//                 pf: "0.87",
-//                 f: "50.0"
-//             }
-//         }
-//     ],
-//     time: "2025-09-04T10:30:00Z"
-// };
-
-// // Example 2: Process sapele-steam data
-// const sapeleSteamData: StreamData = {
-//     id: "sapele-steam",
-//     units: [
-//         {
-//             id: "st1",
-//             pd: {
-//                 mw: "75.5",
-//                 a: "185.3",
-//                 v: "416.2",
-//                 mx: "80.0",
-//                 pf: "0.92",
-//                 f: "50.2"
-//             }
-//         },
-//         {
-//             id: "st2",
-//             pd: {
-//                 mw: "68.9",
-//                 a: "172.1",
-//                 v: "415.9",
-//                 mx: "75.0",
-//                 pf: "0.89",
-//                 f: "49.9"
-//             }
-//         }
-//     ],
-//     time: "2025-09-04T10:31:00Z"
-// };
-
-// // Process the streams
-// console.log('Processing sapele-gas data...');
-// const gasResult = dataManager.processIncomingStream(sapeleGasData);
-
-// console.log('Processing sapele-steam data...');
-// const steamResult = dataManager.processIncomingStream(sapeleSteamData);
-
-// // Get the merged result
-// const mergedSapeleData = dataManager.getStationData('sapele');
-// console.log('Merged sapele data:', JSON.stringify(mergedSapeleData, null, 2));
-
-// // Get all current data
-// console.log('All current data:', JSON.stringify(dataManager.getAllData(), null, 2));
-
-// // Example of updating a specific unit
-// console.log('Updating unit pb202...');
-// const updateSuccess = dataManager.updateUnit('sapele', 'pb202', {
-//     mw: "47.8",
-//     a: "125.1",
-//     v: "415.2"
-// });
-
-// if (updateSuccess) {
-//     console.log('Updated sapele data:', JSON.stringify(dataManager.getStationData('sapele'), null, 2));
-// }
-
-// // Get units by type
-// const gasUnits = dataManager.getUnitsByType('sapele', 'pb');
-// const steamUnits = dataManager.getUnitsByType('sapele', 'st');
-// console.log('Gas units:', gasUnits.length);
-// console.log('Steam units:', steamUnits.length);
-
-// Export the class for use in other modules
+// Export the class and types for use in other modules
 export { MergeStationController };
-export type { StreamData, StationData, Unit, PowerData };
+export type { StreamData, StationData, Unit, PowerData, IncomingStreamData, FlexibleStreamData };

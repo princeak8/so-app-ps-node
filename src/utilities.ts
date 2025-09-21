@@ -53,7 +53,7 @@ export function getStatusTopicStationId(topic:string) {
         case 'OkpaiippGs/status' : return stationIds.Okpai; break;
         // case 'phmains/status' : return stationIds.ph; break;
         case 'riversIppPs/status' : return stationIds.RiversIpp; break;
-        case 'sapelets/status' : return [stationIds.SapeleNipp, stationIds.SapeleSteam]; break;
+        case 'sapele/status' : return [stationIds.SapeleNipp, stationIds.Sapele]; break;
         case 'zungeru/status' : return stationIds.Zungeru; break;
         default: return '';
     }

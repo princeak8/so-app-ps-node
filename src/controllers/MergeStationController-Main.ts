@@ -8,25 +8,9 @@ interface PowerData {
     f: string;
 }
 
-interface PowerData2 {
-    mw: string;
-    A: string;
-    V: string;
-    mvar: string;
-    pf?: string;
-    f?: string;
-}
-
 interface Unit {
     id: string;
-    pd?: PowerData | PowerData2;
-}
-
-interface Line {
-    id: string;
-    gd?: PowerData2;
-    td?: PowerData2;
-    pd?: PowerData | PowerData2;
+    pd: PowerData;
 }
 
 interface StationData {
@@ -48,7 +32,6 @@ interface StreamData {
     id: string;
     name?: string;
     units: Unit[];
-    lines?: Line[];
     time: string;
 }
 
@@ -137,19 +120,12 @@ class MergeStationController {
 
     public processIncomingStream(streamData: StreamData): StationData | null {
         try {
-            let { id, name, units, lines, time } = streamData;
+            let { id, name, units, time } = streamData;
             
             // Check if this station should be merged with others
             let findId = (id) ? id : name;
             if(findId) id = findId;
             const mergeGroupName = this.findMergeGroup(id);
-            if(!units && lines) {
-                lines.forEach((line) => {
-                    if(line.gd) line.pd = line.gd;
-                    if(line.td) line.pd = line.td;
-                });
-                units = lines
-            }
             
             if (mergeGroupName) {
                 this.handleMergeableData(mergeGroupName, id, { units: units || [], time: time || new Date().toISOString() });
@@ -319,12 +295,10 @@ class MergeStationController {
             stationData.units.push(newUnit);
         } else {
             // Update existing unit
-            if(stationData?.units[unitIndex]?.pd) {
-                stationData.units[unitIndex].pd = { 
-                    ...stationData.units[unitIndex].pd, 
-                    ...unitData 
-                };
-            }
+            stationData.units[unitIndex].pd = { 
+                ...stationData.units[unitIndex].pd, 
+                ...unitData 
+            };
         }
 
         stationData.time = new Date().toISOString();
