@@ -5,7 +5,7 @@ export default {
     AfamVI : 'afamVIPs',
     Alaoji : 'alaoji',
     Azura : 'azuraIppPs',
-    Dadinkowa : 'dadinKowaGs',
+    Dadinkowa : 'dadinKowa',
     Delta2 : 'delta2',
     Delta3 : 'delta3',
     Delta4 : 'deltaGs',
