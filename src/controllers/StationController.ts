@@ -28,7 +28,7 @@ const dataQueue = new PowerDataQueue({
     // Stations that should save detailed unit data (others will only save total load)
     stationsWithUnitData: [
         stationIds.Sapele, stationIds.Egbin, stationIds.Delta4, stationIds.Delta3, stationIds.Delta2, stationIds.AfamIII,
-        stationIds.AfamIV, stationIds.AfamV, stationIds.AfamVI 
+        stationIds.AfamIV, stationIds.AfamV, stationIds.AfamVI, stationIds.Dadinkowa
     ] // Example station IDs
 });
 
@@ -81,7 +81,7 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
     // console.log('send message', message);
     // console.log('clients:', wss.clients);
     // console.log(topic);
-    // if(topic.includes('sapelets/pv')) console.log(topic, message.toString());
+    // if(topic.includes('ps/dadinkowa/hydro/gombe/pd')) console.log(topic, message.toString());
     // if(topic.includes('omotoso2ts/tv')) console.log(topic, message.toString());
     // if( topic.includes('ps/sapele')) console.log(message.toString());
     let preparedData = convertAndPrepareData(message.toString(), topic);
