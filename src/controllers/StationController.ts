@@ -28,7 +28,8 @@ const dataQueue = new PowerDataQueue({
     // Stations that should save detailed unit data (others will only save total load)
     stationsWithUnitData: [
         stationIds.Sapele, stationIds.Egbin, stationIds.Delta4, stationIds.Delta3, stationIds.Delta2, stationIds.AfamIII,
-        stationIds.AfamIV, stationIds.AfamV, stationIds.AfamVI, stationIds.Dadinkowa
+        stationIds.AfamIV, stationIds.AfamV, stationIds.AfamVI, stationIds.Dadinkowa, stationIds.ParasEnergy,
+        stationIds.Okpai, stationIds.Shiroro
     ] // Example station IDs
 });
 
@@ -39,7 +40,9 @@ const dataQueue = new PowerDataQueue({
 const mergeIds = {
     'sapele': ['sapele-gas', 'sapele-steam'],
     'deltaGs': ['delta4-1', 'delta4-2'],
-    'omotoshoGas': ['omotosho1', 'omotosho2']
+    'omotoshoGas': ['omotosho1', 'omotosho2'],
+    'parasEnergyPs': ['paras_1', 'paras_2'],
+    'okpaiGs': ['okpai_1', 'okpai_2']
 };
 const mergedStationController = new MergeStationController(mergeIds);
 
@@ -83,9 +86,9 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
     // console.log(topic);
     // if(topic.includes('ps/dadinkowa/hydro/gombe/pd')) console.log(topic, message.toString());
     // if(topic.includes('omotoso2ts/tv')) console.log(topic, message.toString());
-    // if( topic.includes('ps/sapele')) console.log(message.toString());
+    // if( topic.includes('ps/shiroro')) console.log(message.toString());
     let preparedData = convertAndPrepareData(message.toString(), topic);
-    // if(topic=='mesl/aenl/pd') console.log(preparedData);
+    // if(topic=='ps/shiroro/hydro/niger/pd') console.log(preparedData);
 
     // Process each data item for persistence BEFORE sending to WebSocket
     const persistencePromises = preparedData.map(data => {
@@ -111,7 +114,7 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
             // if(topic == 'zungeru/tv') console.log(vals);
             
             preparedData.forEach((data) => {
-                // if(topic=='ps/delta2/gas/delta/pd' && data) console.log(data.sections[0].data);
+                // if(topic=='ps/shiroro/hydro/niger/pd' && data) console.log(data);
                 if(data != null && data != undefined) sendData(wsClient, data); 
             }) 
         }
@@ -119,7 +122,10 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
 }
 
 const convertAndPrepareData = (msg:string, topic:string) => {
-    let mergeTopics = ['ps/sapele', 'ps/delta4-1/gas/Delta/pd', 'ps/delta4-2/gas/Delta/pd', 'omotoso11ts/pv', 'omotoso12ts/pv',];
+    let mergeTopics = [
+        'ps/sapele', 'ps/delta4-1/gas/Delta/pd', 'ps/delta4-2/gas/Delta/pd', 'omotoso11ts/pv', 'omotoso12ts/pv', 
+        'ps/paras_1/gas/lagos/pd', 'ps/paras_2/gas/lagos/pd', 'ps/okpai_1/gas/delta/pd', 'ps/okpai_2/steam/delta/pd', 
+                    ];
     // if(topic == 'omotoso11ts/pv') console.log(msg);
     //  if(topic == 'omotoso12ts/pv') console.log(msg);
     // console.log('send:', msg);
