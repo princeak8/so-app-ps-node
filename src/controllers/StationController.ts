@@ -85,8 +85,8 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
     // console.log('clients:', wss.clients);
     // console.log(topic);
     // if(topic.includes('ps/dadinkowa/hydro/gombe/pd')) console.log(topic, message.toString());
-    if(topic.includes('ps/kainji/hydro/niger/pd')) console.log(topic, message.toString());
-    if( topic.includes('ps/zungeru/hydro/niger/pd')) console.log(message.toString());
+    // if(topic.includes('ps/kainji/hydro/niger/pd')) console.log(topic, message.toString());
+    // if( topic.includes('ps/zungeru/hydro/niger/pd')) console.log(message.toString());
     let preparedData = convertAndPrepareData(message.toString(), topic);
     // if(topic=='ps/shiroro/hydro/niger/pd') console.log(preparedData);
 
