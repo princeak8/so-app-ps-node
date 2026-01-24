@@ -29,7 +29,7 @@ const dataQueue = new PowerDataQueue({
     stationsWithUnitData: [
         stationIds.Sapele, stationIds.Egbin, stationIds.Delta4, stationIds.Delta3, stationIds.Delta2, stationIds.AfamIII,
         stationIds.AfamIV, stationIds.AfamV, stationIds.AfamVI, stationIds.Dadinkowa, stationIds.ParasEnergy,
-        stationIds.Okpai, stationIds.Shiroro
+        stationIds.Okpai, stationIds.Shiroro, stationIds.Zungeru, stationIds.Jebba, stationIds.Kainji
     ] // Example station IDs
 });
 
@@ -85,8 +85,8 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
     // console.log('clients:', wss.clients);
     // console.log(topic);
     // if(topic.includes('ps/dadinkowa/hydro/gombe/pd')) console.log(topic, message.toString());
-    // if(topic.includes('omotoso2ts/tv')) console.log(topic, message.toString());
-    // if( topic.includes('ps/shiroro')) console.log(message.toString());
+    if(topic.includes('ps/kainji/hydro/niger/pd')) console.log(topic, message.toString());
+    if( topic.includes('ps/zungeru/hydro/niger/pd')) console.log(message.toString());
     let preparedData = convertAndPrepareData(message.toString(), topic);
     // if(topic=='ps/shiroro/hydro/niger/pd') console.log(preparedData);
 
