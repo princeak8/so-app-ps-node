@@ -293,7 +293,7 @@ class PowerDataQueue {
 
         try {
             const response = await axios.post(
-                `${this.config.apiBaseUrl}power_data/save`,
+                `${this.config.apiBaseUrl}/power_data/save`,
                 { data: dataArray },
                 {
                     headers: {
@@ -308,7 +308,7 @@ class PowerDataQueue {
             return response.data;
 
         } catch (error) {
-            // console.log(`Error: ${this.config.apiBaseUrl}power_data/save`,  { data: dataArray }, error.message)
+            console.log(`Error: ${this.config.apiBaseUrl}power_data/save`, error.message)
             this.log(`Failed to send power data: ${error.message}`);
             await this.addToFailedQueue('power_data', dataArray);
             throw error;

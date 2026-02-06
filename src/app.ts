@@ -100,4 +100,6 @@ localStorage.setItem(storage.StartSendingTotal, false);
 localStorage.setItem(storage.StartedSendingTotal, false);
 localStorage.setItem('localTrials', 0);
 
-server.listen("3002", async () => console.log("Server started on port 3002"));
+const port = 3002;
+
+server.listen(port, async () => console.log("Server started on port "+port));
