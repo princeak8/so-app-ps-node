@@ -79,14 +79,14 @@ class PowerDataQueue {
             if (this.stationsWithUnitData.includes(stationId)) powerData.unitsData = this.extractUnitSections(data.sections);
 
             // Add to power data queue
-            await this.addToPowerDataQueue(powerData);
+            this.addToPowerDataQueue(powerData);
 
             // Only save unit data for specified stations
             // if (this.stationsWithUnitData.includes(stationId)) {
             //     const unitDataArray = this.prepareUnitData(stationId, data.sections, timestamp);
                 
             //     for (const unitData of unitDataArray) {
-            //         await this.addToUnitDataQueue(unitData);
+            //         this.addToUnitDataQueue(unitData);
             //     }
             // }
 
@@ -200,19 +200,19 @@ class PowerDataQueue {
     /**
      * Add power data to queue
      */
-    async addToPowerDataQueue(powerData) {
+    addToPowerDataQueue(powerData) {
         const queue = JSON.parse(localStorage.getItem(this.POWER_DATA_QUEUE) || '[]');
         queue.push(powerData);
-        await localStorage.setItem(this.POWER_DATA_QUEUE, JSON.stringify(queue));
+        localStorage.setItem(this.POWER_DATA_QUEUE, JSON.stringify(queue));
     }
 
     /**
      * Add unit data to queue
      */
-    async addToUnitDataQueue(unitData) {
+    addToUnitDataQueue(unitData) {
         const queue = JSON.parse(localStorage.getItem(this.UNIT_DATA_QUEUE) || '[]');
         queue.push(unitData);
-        await localStorage.setItem(this.UNIT_DATA_QUEUE, JSON.stringify(queue));
+        localStorage.setItem(this.UNIT_DATA_QUEUE, JSON.stringify(queue));
     }
 
     /**
@@ -254,7 +254,7 @@ class PowerDataQueue {
      */
     async flushQueues() {
         if (this.isProcessing) {
-            this.log('Flush already in progress, skipping...');
+            // this.log('Flush already in progress, skipping...');
             return;
         }
 
@@ -278,7 +278,7 @@ class PowerDataQueue {
             // this.log(`Flushed ${powerQueue.length} power records and ${unitQueue.length} unit records`);
 
         } catch (error) {
-            this.log('Error during flush:', error.message);
+            // this.log('Error during flush:', error.message);
             // this.log('error sending:', powerQueue);
         } finally {
             this.isProcessing = false;
@@ -308,8 +308,8 @@ class PowerDataQueue {
             return response.data;
 
         } catch (error) {
-            console.log(`Error: ${this.config.apiBaseUrl}power_data/save`, error.message)
-            this.log(`Failed to send power data: ${error.message}`);
+            // console.log(`Error: ${this.config.apiBaseUrl}power_data/save`, error.message)
+            // this.log(`Failed to send power data: ${error.message}`);
             await this.addToFailedQueue('power_data', dataArray);
             throw error;
         }
@@ -339,7 +339,7 @@ class PowerDataQueue {
 
         } catch (error) {
             // console.log(`Error1: ${this.config.apiBaseUrl}/power-monitoring/stream/unit-data`, error.message)
-            this.log(`Failed to send unit data: ${error.message}`);
+            // this.log(`Failed to send unit data: ${error.message}`);
             await this.addToFailedQueue('unit_data', dataArray);
             throw error;
         }
@@ -373,7 +373,7 @@ class PowerDataQueue {
 
         for (const failedRequest of failedQueue) {
             if (failedRequest.retries >= this.config.maxRetries) {
-                this.log(`Dropping failed request after ${this.config.maxRetries} retries:`, failedRequest.type);
+                // this.log(`Dropping failed request after ${this.config.maxRetries} retries:`, failedRequest.type);
                 continue;
             }
 
@@ -384,14 +384,14 @@ class PowerDataQueue {
                     await this.sendUnitData(failedRequest.data);
                 }
                 
-                this.log(`Successfully retried ${failedRequest.type} request`);
+                // this.log(`Successfully retried ${failedRequest.type} request`);
                 // Don't add back to queue if successful
                 
             } catch (error) {
                 // Add back to queue with incremented retry count
                 failedRequest.retries++;
                 updatedQueue.push(failedRequest);
-                this.log(`Retry ${failedRequest.retries} failed for ${failedRequest.type}: ${error.message}`);
+                // this.log(`Retry ${failedRequest.retries} failed for ${failedRequest.type}: ${error.message}`);
             }
         }
 

@@ -81,12 +81,12 @@ StationController.sendLocalMessage= (client:Client) => {
 }
 
 const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
-    // console.log('send message', message);
+    // console.log('send message', message.toString());
     // console.log('clients:', wss.clients);
-    // console.log(topic);
-    // if(topic.includes('ps/dadinkowa/hydro/gombe/pd')) console.log(topic, message.toString());
-    // if(topic.includes('ps/kainji/hydro/niger/pd')) console.log(topic, message.toString());
-    // if( topic.includes('ps/zungeru/hydro/niger/pd')) console.log(message.toString());
+    // if(topic.includes('afl')) console.log(message.toString());
+    // if(topic.includes('bilateral/mesl/ganfeng/nasarawa/pd')) console.log(topic, message.toString());
+    // if(topic.includes('mesl/phedc/port-harcourt/pd')) console.log(topic, message.toString());
+    // if( topic.includes('mesl/quantum/lagos/pd')) console.log(message.toString());
     let preparedData = convertAndPrepareData(message.toString(), topic);
     // if(topic=='ps/shiroro/hydro/niger/pd') console.log(preparedData);
 
@@ -114,6 +114,7 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
             // if(topic == 'zungeru/tv') console.log(vals);
             
             preparedData.forEach((data) => {
+                // console.log("sending data",data);
                 // if(topic=='ps/shiroro/hydro/niger/pd' && data) console.log(data);
                 if(data != null && data != undefined) sendData(wsClient, data); 
             }) 
@@ -241,12 +242,12 @@ const formatData = (data: rawStationType) => {
             'pheonix', 'quantum', 'sunflag', 'africanFoundriesLimited', 'starPipe', 'topSteel', 'pulkitSteel', 'kamSteel', 'larfarge', 'monarch',
             'kamSteel-Ilorin'
         ];
-    if(!companies.includes(formattedDataCopy.id)) {
-        let total = aggregateTotal(formattedDataCopy, isAbsolute);
-        // if(startSendingTotalToPowerBi() && sendNewDataToPowerBi()) sendTotalToPowerBi(total);
-        let started = localStorage.getItem(storage.StartedSendingTotal);
-        if(startSendingTotalToPowerBi() && !started) startSendingLoop();
-    }
+    // if(!companies.includes(formattedDataCopy.id)) {
+    //     let total = aggregateTotal(formattedDataCopy, isAbsolute);
+    //     // if(startSendingTotalToPowerBi() && sendNewDataToPowerBi()) sendTotalToPowerBi(total);
+    //     let started = localStorage.getItem(storage.StartedSendingTotal);
+    //     if(startSendingTotalToPowerBi() && !started) startSendingLoop();
+    // }
     return formattedData;
     // console.log('total:',total);
 }

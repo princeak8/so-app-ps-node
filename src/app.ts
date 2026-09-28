@@ -69,11 +69,8 @@ const loadPowerBi = () => {
 // loadPowerBi();
 
 server.on("upgrade", async function upgrade(request:IncomingMessage, socket:Duplex, head:Buffer) {
-    // console.log(request.headers.upgrade);
     wss.handleUpgrade(request, socket, head, function done(ws) {
-        
-    //     // console.log('handling upgrade')
-    //     // wss.emit("connection", ws, request);
+        wss.emit("connection", ws, request);
         ws.on("error", (error) => console.log("websocket error", error));
     });
 });
@@ -100,6 +97,6 @@ localStorage.setItem(storage.StartSendingTotal, false);
 localStorage.setItem(storage.StartedSendingTotal, false);
 localStorage.setItem('localTrials', 0);
 
-const port = 3002;
+const port = 3020;
 
 server.listen(port, async () => console.log("Server started on port "+port));

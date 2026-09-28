@@ -1,10 +1,11 @@
 // import logger from './logger';
 
-var { writeFileSync, existsSync, readFileSync, unlink } = require('fs');
+var { writeFileSync, writeFile, existsSync, readFileSync, unlink } = require('fs');
 
 class LocalStorage {
 
     constructor() {
+        this.writeTimeout = null;
         if (existsSync('localStorage.json')) {
             var txt = readFileSync('localStorage.json');
             try{
@@ -67,15 +68,20 @@ class LocalStorage {
     }
 
     writeItemsToLocalstorage() {
-        try{
-            writeFileSync('localStorage.json', JSON.stringify(this.items), error => {
-                if (error) {
-                    console.log('Error occurred during writing file');
-                }
-            })
-        }catch(error) {
-            //
+        if (this.writeTimeout) {
+            clearTimeout(this.writeTimeout);
         }
+        this.writeTimeout = setTimeout(() => {
+            try {
+                writeFile('localStorage.json', JSON.stringify(this.items), error => {
+                    if (error) {
+                        console.log('Error occurred during writing file');
+                    }
+                });
+            } catch (error) {
+                //
+            }
+        }, 100);
     }
 
     print() {

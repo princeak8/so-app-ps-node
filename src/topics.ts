@@ -60,13 +60,14 @@ const aws = [
 
     //MESL
     'mesl/zeberced/pd', 'mesl/inner-galaxy1/pd', 'mesl/inner-galaxy2/pd', 'mesl/niamey/pd',
-    'mesl/ATVL/pd', 'mesl/PSML/pd', 'mesl/gazaoua/pd', 'mesl/Kam33/pd', 'mesl/amil/pd', 'mesl/aenl/pd',
+    'mesl/ATVL/pd', 'mesl/PSML/pd', 'mesl/gazaoua/pd', 'mesl/Kam33/pd', 'mesl/amil/pd', 'mesl/aenl/pd', 
+    'bilateral/mesl/ganfeng/nasarawa/pd', 'mesl/phedc/port-harcourt/pd',
     
     // Taopex
     'taopex/kamSteel/sagamu/pd', 'taopex/kamSteel/ilorin/pd', 'taopex/erKang/ilorin/pd',
 
     //FIPL
-    'fipl/oaui/pd', 'fipl/fmpia/pd'
+    'fipl/oaui/pd', 'fipl/fmpia/pd',
     
 ];
 
