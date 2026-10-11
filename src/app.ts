@@ -78,9 +78,10 @@ server.on("upgrade", async function upgrade(request:IncomingMessage, socket:Dupl
 
 
 
-let client = mqtt.connect(host, options);
-let client2 = mqtt.connect(host2, options2);
-let localClient = mqtt.connect(localHost, localOptions);
+const clientConfig = { reconnectPeriod: 5000, connectTimeout: 30000 };
+let client = mqtt.connect(host, { ...options, ...clientConfig });
+let client2 = mqtt.connect(host2, { ...options2, ...clientConfig });
+let localClient = mqtt.connect(localHost, { ...localOptions, ...clientConfig });
 
 mqttConnect(client, topics);
 mqttConnect(client2, topics);
@@ -97,6 +98,6 @@ localStorage.setItem(storage.StartSendingTotal, false);
 localStorage.setItem(storage.StartedSendingTotal, false);
 localStorage.setItem('localTrials', 0);
 
-const port = 3020;
+const port = process.env.PORT;
 
 server.listen(port, async () => console.log("Server started on port "+port));

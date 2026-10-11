@@ -110,9 +110,11 @@ const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
         // console.log('client ready');
         // console.log(wsClient.readyState);
         if (wsClient.readyState === WebSocket.OPEN) {
-            // console.log('client ready', preparedData);
-            // if(topic == 'zungeru/tv') console.log(vals);
-            
+            // Drop telemetry frames if client socket buffer is backed up (> 1 MB) to avoid memory leaks
+            if (wsClient.bufferedAmount > 1024 * 1024) {
+                return;
+            }
+
             preparedData.forEach((data) => {
                 // console.log("sending data",data);
                 // if(topic=='ps/shiroro/hydro/niger/pd' && data) console.log(data);

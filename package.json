@@ -7,9 +7,9 @@
   "target": "es2017",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx nodemon --ignore localStorage.json",
+    "start": "npx nodemon --exec \"node --max-old-space-size=4096 -r ts-node/register\" src/app.ts --ignore localStorage.json",
     "build": "rimraf ./build && tsc",
-    "start:prod": "npm run build && node build/index.js"
+    "start:prod": "npm run build && node --max-old-space-size=4096 build/index.js"
   },
   "author": "Akachukwu",
   "license": "ISC",

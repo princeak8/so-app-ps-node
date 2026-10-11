@@ -20,6 +20,10 @@ class PowerDataQueue {
         // Array of station IDs that should save unit data
         this.stationsWithUnitData = config.stationsWithUnitData || [];
         
+        // Queue size limits to prevent out of memory issues
+        this.maxQueueSize = config.maxQueueSize || 2000;
+        this.maxFailedQueueSize = config.maxFailedQueueSize || 500;
+        
         // Queue keys for localStorage
         this.POWER_DATA_QUEUE = 'power_data_queue';
         this.UNIT_DATA_QUEUE = 'unit_data_queue';
@@ -201,8 +205,19 @@ class PowerDataQueue {
      * Add power data to queue
      */
     addToPowerDataQueue(powerData) {
-        const queue = JSON.parse(localStorage.getItem(this.POWER_DATA_QUEUE) || '[]');
+        let queue = [];
+        try {
+            queue = JSON.parse(localStorage.getItem(this.POWER_DATA_QUEUE) || '[]');
+        } catch (e) {
+            queue = [];
+        }
         queue.push(powerData);
+
+        // Enforce hard cap (FIFO) to prevent runaway memory usage
+        if (queue.length > this.maxQueueSize) {
+            queue.splice(0, queue.length - this.maxQueueSize);
+        }
+
         localStorage.setItem(this.POWER_DATA_QUEUE, JSON.stringify(queue));
     }
 
@@ -210,8 +225,19 @@ class PowerDataQueue {
      * Add unit data to queue
      */
     addToUnitDataQueue(unitData) {
-        const queue = JSON.parse(localStorage.getItem(this.UNIT_DATA_QUEUE) || '[]');
+        let queue = [];
+        try {
+            queue = JSON.parse(localStorage.getItem(this.UNIT_DATA_QUEUE) || '[]');
+        } catch (e) {
+            queue = [];
+        }
         queue.push(unitData);
+
+        // Enforce hard cap (FIFO)
+        if (queue.length > this.maxQueueSize) {
+            queue.splice(0, queue.length - this.maxQueueSize);
+        }
+
         localStorage.setItem(this.UNIT_DATA_QUEUE, JSON.stringify(queue));
     }
 
@@ -349,7 +375,12 @@ class PowerDataQueue {
      * Add failed requests to retry queue
      */
     async addToFailedQueue(type, data) {
-        const failedQueue = JSON.parse(localStorage.getItem(this.FAILED_REQUESTS_QUEUE) || '[]');
+        let failedQueue = [];
+        try {
+            failedQueue = JSON.parse(localStorage.getItem(this.FAILED_REQUESTS_QUEUE) || '[]');
+        } catch (e) {
+            failedQueue = [];
+        }
         
         failedQueue.push({
             type: type,
@@ -357,6 +388,11 @@ class PowerDataQueue {
             timestamp: new Date().toISOString(),
             retries: 0
         });
+
+        // Enforce hard cap (FIFO) on failed requests
+        if (failedQueue.length > this.maxFailedQueueSize) {
+            failedQueue.splice(0, failedQueue.length - this.maxFailedQueueSize);
+        }
 
         await localStorage.setItem(this.FAILED_REQUESTS_QUEUE, JSON.stringify(failedQueue));
     }
