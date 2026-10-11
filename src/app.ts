@@ -100,4 +100,5 @@ localStorage.setItem('localTrials', 0);
 
 const port = process.env.PORT;
 
-server.listen(port, async () => console.log("Server started on port "+port));
+// server.listen(port, async () => console.log("Server started on port "+port));
+server.listen(Number(port), "0.0.0.0", async () => console.log("Server started on port " + port));
