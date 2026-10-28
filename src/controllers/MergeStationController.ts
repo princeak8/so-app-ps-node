@@ -17,6 +17,7 @@ interface StationData {
     id: string;
     units: Unit[];
     time: string;
+    t?: string;
 }
 
 interface InternalStationData extends StationData {
@@ -52,7 +53,8 @@ interface StreamData {
     id: string;
     name?: string;
     units: Unit[];
-    time: string;
+    time?: string;
+    t?: string;
 }
 
 // Union type for both data formats
@@ -100,7 +102,8 @@ class MergeStationController {
             dataObj[key] = {
                 id: value.id,
                 units: value.units,
-                time: value.time
+                time: value.time,
+                t: value.time
             };
         }
         
@@ -128,22 +131,35 @@ class MergeStationController {
                 }
             }));
 
+            const parsedTime = this.parseTime(data.t);
             return {
                 id: data.id,
                 units: units,
-                time: this.parseTime(data.t)
+                time: parsedTime,
+                t: parsedTime
             };
         } else {
             // Already in standard format
-            return data as StreamData;
+            const raw = data as any;
+            const timeStr = raw.time || raw.t || new Date().toISOString();
+            const parsedTime = this.parseTime(timeStr);
+            return {
+                id: raw.id || raw.name,
+                units: raw.units || [],
+                time: parsedTime,
+                t: parsedTime
+            };
         }
     }
 
     // Helper method to parse time string to ISO format
     private parseTime(timeStr: string): string {
         try {
-            // If it's just time (like "9:58:29"), assume it's today
-            if (timeStr.match(/^\d{1,2}:\d{2}:\d{2}$/)) {
+            if (!timeStr || typeof timeStr !== 'string' || timeStr.trim() === '') {
+                return new Date().toISOString();
+            }
+            // If it's just time (like "9:58:29" or "11:49:5"), assume it's today
+            if (timeStr.match(/^\d{1,2}:\d{1,2}:\d{1,2}$/)) {
                 const today = new Date();
                 const [hours, minutes, seconds] = timeStr.split(':').map(Number);
                 today.setHours(hours, minutes, seconds, 0);
@@ -247,6 +263,9 @@ class MergeStationController {
             }
         }
 
+        // Sort units deterministically by unit ID (e.g., gt1, gt2, ..., gt8)
+        allUnits.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true, sensitivity: 'base' }));
+
         return allUnits;
     }
 
@@ -266,7 +285,8 @@ class MergeStationController {
         return {
             id: data.id,
             units: data.units,
-            time: data.time
+            time: data.time,
+            t: data.time
         };
     }
 

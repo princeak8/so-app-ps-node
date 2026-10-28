@@ -29,7 +29,8 @@ const dataQueue = new PowerDataQueue({
     stationsWithUnitData: [
         stationIds.Sapele, stationIds.Egbin, stationIds.Delta4, stationIds.Delta3, stationIds.Delta2, stationIds.AfamIII,
         stationIds.AfamIV, stationIds.AfamV, stationIds.AfamVI, stationIds.Dadinkowa, stationIds.ParasEnergy,
-        stationIds.Okpai, stationIds.Shiroro, stationIds.Zungeru, stationIds.Jebba, stationIds.Kainji
+        stationIds.Okpai, stationIds.Shiroro, stationIds.Zungeru, stationIds.Jebba, stationIds.Kainji,
+        stationIds.OlorunsogoGas, stationIds.OmotoshoGas
     ] // Example station IDs
 });
 
@@ -40,9 +41,14 @@ const dataQueue = new PowerDataQueue({
 const mergeIds = {
     'sapele': ['sapele-gas', 'sapele-steam'],
     'deltaGs': ['delta4-1', 'delta4-2'],
-    'omotoshoGas': ['omotosho1', 'omotosho2'],
+    'omotoshoGas': ['omotoshoGas1', 'omotoshoGas3', 'omotoshoGas5', 'omotoshoGas7', 'omotosho1', 'omotosho2'],
     'parasEnergyPs': ['paras_1', 'paras_2'],
-    'okpaiGs': ['okpai_1', 'okpai_2']
+    'okpaiGs': ['okpai_1', 'okpai_2'],
+    'olorunsogoGas': [
+        'olorunsogoGas1', 'olorunsogoGas3', 'olorunsogoGas5', 'olorunsogoGas7',
+        'olorunsogo_1', 'olorunsogo_3', 'olorunsogo_5', 'olorunsogo_7',
+        'olorunsogo1', 'olorunsogo3', 'olorunsogo5', 'olorunsogo7'
+    ]
 };
 const mergedStationController = new MergeStationController(mergeIds);
 
@@ -83,7 +89,7 @@ StationController.sendLocalMessage= (client:Client) => {
 const sendMessage = (wss:WebSocket.Server, message:Buffer, topic='') => {
     // console.log('send message', message.toString());
     // console.log('clients:', wss.clients);
-    // if(topic.includes('afl')) console.log(message.toString());
+    // if(topic.includes('olorunsogo_')) console.log(topic, message.toString());
     // if(topic.includes('bilateral/mesl/ganfeng/nasarawa/pd')) console.log(topic, message.toString());
     // if(topic.includes('mesl/phedc/port-harcourt/pd')) console.log(topic, message.toString());
     // if( topic.includes('mesl/quantum/lagos/pd')) console.log(message.toString());
@@ -128,7 +134,9 @@ const convertAndPrepareData = (msg:string, topic:string) => {
     let mergeTopics = [
         'ps/sapele', 'ps/delta4-1/gas/Delta/pd', 'ps/delta4-2/gas/Delta/pd', 'omotoso11ts/pv', 'omotoso12ts/pv', 
         'ps/paras_1/gas/lagos/pd', 'ps/paras_2/gas/lagos/pd', 'ps/okpai_1/gas/delta/pd', 'ps/okpai_2/steam/delta/pd', 
-                    ];
+        'ps/olorunsogo_1/gas/ogun/pd', 'ps/olorunsogo_3/gas/ogun/pd', 'ps/olorunsogo_5/gas/ogun/pd', 'ps/olorunsogo_7/gas/ogun/pd',
+        'ps/omotosho_1/gas/ondo/pd', 'ps/omotosho_3/gas/ondo/pd', 'ps/omotosho_5/gas/ondo/pd', 'ps/omotosho_7/gas/ondo/pd'
+    ];
     // if(topic == 'omotoso11ts/pv') console.log(msg);
     //  if(topic == 'omotoso12ts/pv') console.log(msg);
     // console.log('send:', msg);

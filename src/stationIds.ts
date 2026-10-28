@@ -22,6 +22,7 @@ export default {
     Omotosho1 : 'omotosho1',
     Omotosho2 : 'omotosho2',
     OmotoshoNipp : 'omotoshoNippPs',
+    OmotoshoGas : 'omotoshoGas',
     ParasEnergy : 'parasEnergyPs',
     RiversIpp : 'riversIppPs',
     SapeleNipp : 'sapeleNipp',

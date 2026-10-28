@@ -61,7 +61,10 @@ export const getMergeStationId = (subId: string, mergeIds: Object) => {
     return null;
 }
 
-export const getDateTime = (t=null, date=null) => {
+export const getDateTime = (t: string | null = null, date: string | null = null) => {
+    if (t && typeof t === 'string' && t.includes('T')) {
+        return t.replace('T', ' ').substring(0, 19);
+    }
     if(t && !date) return new Date().toISOString().split('T')[0] + ' ' + t;
     if(t && date) return date+' '+t;
     return new Date().toISOString().replace('T', ' ').substring(0, 19);

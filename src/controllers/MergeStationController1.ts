@@ -323,7 +323,7 @@ class MergeStationController {
                 stationData.units[unitIndex].pd = { 
                     ...stationData.units[unitIndex].pd, 
                     ...unitData 
-                };
+                } as any;
             }
         }
 
